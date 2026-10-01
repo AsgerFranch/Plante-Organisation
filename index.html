@@ -28,73 +28,78 @@
         }
     </script>
     <style>
-        /* Custom scrollbar for a polished look */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #ecfdf5; 
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #a7f3d0; 
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #34d399; 
-        }
-        /* Smooth transitions */
-        .modal-enter {
-            opacity: 0;
-            transform: scale(0.95);
-        }
-        .modal-enter-active {
-            opacity: 1;
-            transform: scale(1);
-            transition: opacity 200ms, transform 200ms ease-out;
-        }
-        .modal-leave {
-            opacity: 1;
-            transform: scale(1);
-        }
-        .modal-leave-active {
-            opacity: 0;
-            transform: scale(0.95);
-            transition: opacity 150ms, transform 150ms ease-in;
-        }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #ecfdf5; }
+        ::-webkit-scrollbar-thumb { background: #a7f3d0; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #34d399; }
     </style>
 </head>
-<body class="bg-emerald-50 text-slate-800 min-h-screen relative pb-24 md:pb-8">
+<body class="bg-emerald-50 text-slate-800 min-h-screen relative">
 
-    <header class="bg-white shadow-sm sticky top-0 z-30">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-            <div class="flex items-center gap-2">
-                <span class="text-2xl">🌱</span>
-                <h1 class="text-xl font-bold text-emerald-900 tracking-tight">Mine Planter</h1>
+    <!-- LOGIN SCREEN -->
+    <div id="auth-container" class="min-h-screen flex items-center justify-center p-4 z-50 bg-emerald-50">
+        <div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md border border-emerald-100">
+            <div class="text-center mb-8">
+                <span class="text-5xl block mb-4">🌱</span>
+                <h1 class="text-2xl font-bold text-emerald-900">Plante Vagt</h1>
+                <p class="text-gray-500 text-sm mt-2">Log ind for at administrere dine planter</p>
             </div>
-            <div class="flex gap-3">
-                <button onclick="requestNotificationPermission()" class="hidden sm:flex items-center gap-2 text-sm font-medium text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 px-3 py-2 rounded-lg transition-colors">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>
-                    Notifikationer
-                </button>
-                <button onclick="openPlantModal()" class="hidden sm:flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors shadow-sm">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" /></svg>
-                    Tilføj Plante
-                </button>
+            
+            <div class="space-y-5">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                    <input type="email" id="auth-email" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="din@email.dk">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Adgangskode</label>
+                    <input type="password" id="auth-password" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="••••••••">
+                </div>
+                
+                <div class="pt-4 flex flex-col gap-3">
+                    <button onclick="handleLogin()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2.5 rounded-lg transition-colors shadow-sm">Log ind</button>
+                    <button onclick="handleSignup()" class="w-full bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 font-medium py-2.5 rounded-lg transition-colors">Opret ny konto</button>
+                </div>
             </div>
         </div>
-    </header>
+    </div>
 
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div id="plant-list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            <!-- Plant cards will be injected here via JS -->
-        </div>
-    </main>
+    <!-- MAIN APP SCREEN (Hidden by default) -->
+    <div id="app-container" class="hidden pb-24 md:pb-8">
+        <header class="bg-white shadow-sm sticky top-0 z-30">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <span class="text-2xl">🌱</span>
+                    <h1 class="text-xl font-bold text-emerald-900 tracking-tight">Mine Planter</h1>
+                </div>
+                <div class="flex items-center gap-3">
+                    <button onclick="requestNotificationPermission()" class="hidden sm:flex items-center gap-2 text-sm font-medium text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 px-3 py-2 rounded-lg transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>
+                    </button>
+                    <button onclick="openPlantModal()" class="hidden sm:flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors shadow-sm">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" /></svg>
+                        Tilføj Plante
+                    </button>
+                    <div class="w-px h-6 bg-gray-200 mx-1"></div>
+                    <button onclick="handleLogout()" class="text-sm font-medium text-gray-500 hover:text-red-600 hover:bg-red-50 px-3 py-2 rounded-lg transition-colors">
+                        Log ud
+                    </button>
+                </div>
+            </div>
+        </header>
 
-    <!-- Floating Action Button for Mobile -->
-    <button onclick="openPlantModal()" class="sm:hidden fixed bottom-6 right-6 h-14 w-14 bg-emerald-600 text-white rounded-full shadow-lg flex items-center justify-center hover:bg-emerald-700 transition-colors z-30">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
-    </button>
+        <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div id="plant-list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Plant cards will be injected here via JS -->
+            </div>
+        </main>
 
+        <!-- Floating Action Button for Mobile -->
+        <button onclick="openPlantModal()" class="sm:hidden fixed bottom-6 right-6 h-14 w-14 bg-emerald-600 text-white rounded-full shadow-lg flex items-center justify-center hover:bg-emerald-700 transition-colors z-30">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
+        </button>
+    </div>
+
+    <!-- Modals (Add, Delete) -->
     <div id="plant-modal" class="fixed inset-0 z-50 hidden">
         <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity" onclick="closePlantModal()"></div>
         <div class="fixed inset-0 flex items-center justify-center p-4">
@@ -107,34 +112,30 @@
                 </div>
                 <div class="p-6 space-y-4">
                     <input type="hidden" id="p-id">
-                    
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Plantens navn</label>
-                        <input type="text" id="p-name" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all" placeholder="fx. Rosmarin">
+                        <input type="text" id="p-name" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-emerald-500 outline-none">
                     </div>
-                    
                     <div class="grid grid-cols-2 gap-4">
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Vanding (dage)</label>
-                            <input type="number" id="p-water" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="fx. 4" min="1">
+                            <input type="number" id="p-water" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-emerald-500 outline-none" min="1">
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Gødning (dage)</label>
-                            <input type="number" id="p-fert" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="fx. 14" min="1">
+                            <input type="number" id="p-fert" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-emerald-500 outline-none" min="1">
                         </div>
                     </div>
-
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Kommentarer/Specielle forhold</label>
-                        <textarea id="p-notes" rows="2" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all resize-none" placeholder="fx. Trives bedst i indirekte lys..."></textarea>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Kommentarer</label>
+                        <textarea id="p-notes" rows="2" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-emerald-500 outline-none resize-none"></textarea>
                     </div>
-
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Billede</label>
                         <div class="flex items-center justify-center w-full">
                             <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-emerald-200 rounded-lg cursor-pointer bg-emerald-50 hover:bg-emerald-100 transition-colors">
                                 <div class="flex flex-col items-center justify-center pt-5 pb-6">
-                                    <svg class="w-8 h-8 mb-2 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                                    <svg class="w-8 h-8 mb-2 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
                                     <p class="mb-2 text-sm text-gray-500"><span class="font-semibold">Klik for at uploade</span></p>
                                 </div>
                                 <input id="p-image" type="file" class="hidden" accept="image/*" onchange="previewImage(event)" />
@@ -144,38 +145,37 @@
                     </div>
                 </div>
                 <div class="px-6 py-4 border-t border-gray-100 flex justify-end gap-3 bg-gray-50">
-                    <button onclick="closePlantModal()" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">Annuller</button>
-                    <button onclick="savePlantData()" class="px-4 py-2 text-sm font-medium text-white bg-emerald-600 border border-transparent rounded-lg hover:bg-emerald-700 transition-colors shadow-sm">Gem Plante</button>
+                    <button onclick="closePlantModal()" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">Annuller</button>
+                    <button onclick="savePlantData()" class="px-4 py-2 text-sm font-medium text-white bg-emerald-600 rounded-lg hover:bg-emerald-700 shadow-sm">Gem Plante</button>
                 </div>
             </div>
         </div>
     </div>
 
     <div id="delete-modal" class="fixed inset-0 z-50 hidden">
-        <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity" onclick="closeDeleteModal()"></div>
+        <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onclick="closeDeleteModal()"></div>
         <div class="fixed inset-0 flex items-center justify-center p-4">
-            <div class="bg-white rounded-2xl shadow-xl w-full max-w-sm overflow-hidden transform transition-all relative p-6 text-center">
+            <div class="bg-white rounded-2xl shadow-xl w-full max-w-sm p-6 text-center relative">
                 <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                    <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                 </div>
                 <h3 class="text-lg font-semibold text-gray-900 mb-2">Slet Plante?</h3>
                 <p class="text-sm text-gray-500 mb-6">Er du sikker på, at du vil slette denne plante? Dette kan ikke fortrydes.</p>
                 <div class="flex justify-center gap-3">
-                    <button onclick="closeDeleteModal()" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors flex-1">Annuller</button>
-                    <button id="confirm-delete-btn" onclick="confirmDelete()" class="px-4 py-2 text-sm font-medium text-white bg-red-600 border border-transparent rounded-lg hover:bg-red-700 transition-colors shadow-sm flex-1">Slet</button>
+                    <button onclick="closeDeleteModal()" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg flex-1">Annuller</button>
+                    <button id="confirm-delete-btn" onclick="confirmDelete()" class="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg flex-1">Slet</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Toast Notification Container -->
     <div id="toast-container" class="fixed bottom-20 sm:bottom-6 left-1/2 transform -translate-x-1/2 z-50 flex flex-col gap-2 pointer-events-none"></div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
-        import { getFirestore, collection, onSnapshot, addDoc, updateDoc, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
+        import { getFirestore, collection, onSnapshot, addDoc, updateDoc, deleteDoc, doc, query, where } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
 
-        // Firebase Configuration
         const firebaseConfig = {
             apiKey: "AIzaSyAuXoKwdJw4t0Z7AcFxD9sgB1obLXwvuhE",
             authDomain: "planteorg.firebaseapp.com",
@@ -186,17 +186,84 @@
             measurementId: "G-G7PEWNP7BH"
         };
 
-        // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
+        const auth = getAuth(app);
 
         const defaultSVG = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" fill="none"><rect width="400" height="300" fill="%23d1fae5"/><path d="M200 250c0-60-40-100-40-150s20-60 40-70c20 10 40 20 40 70s-40 90-40 150z" fill="%2310b981" opacity="0.8"/><path d="M200 250c0-40-20-80-20-120s10-40 20-50c10 10 20 10 20 50s-20 80-20 120z" fill="%23059669"/></svg>`;
 
         let plants = [];
         let plantToDeleteId = null;
         let activeImageBase64 = "";
+        let unsubscribePlants = null;
 
-        // Core Functions
+        // AUTHENTICATION LOGIC
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                document.getElementById('auth-container').classList.add('hidden');
+                document.getElementById('app-container').classList.remove('hidden');
+                
+                // Fetch ONLY the plants belonging to the logged in user
+                const q = query(collection(db, 'plants'), where("userId", "==", user.uid));
+                unsubscribePlants = onSnapshot(q, (snapshot) => {
+                    plants = [];
+                    snapshot.forEach((doc) => {
+                        plants.push({ id: doc.id, ...doc.data() });
+                    });
+                    renderPlants();
+                    setTimeout(checkNotifications, 2000); // Check notifications when data loads
+                });
+            } else {
+                document.getElementById('auth-container').classList.remove('hidden');
+                document.getElementById('app-container').classList.add('hidden');
+                plants = [];
+                renderPlants();
+                if (unsubscribePlants) {
+                    unsubscribePlants();
+                    unsubscribePlants = null;
+                }
+            }
+        });
+
+        async function handleLogin() {
+            const email = document.getElementById('auth-email').value;
+            const password = document.getElementById('auth-password').value;
+            if(!email || !password) return showToast("Udfyld venligst begge felter", "error");
+            
+            try {
+                await signInWithEmailAndPassword(auth, email, password);
+                showToast("Velkommen tilbage! 🪴", "success");
+            } catch (error) {
+                showToast("Fejl: Forkert email eller adgangskode.", "error");
+            }
+        }
+
+        async function handleSignup() {
+            const email = document.getElementById('auth-email').value;
+            const password = document.getElementById('auth-password').value;
+            if(!email || !password) return showToast("Udfyld venligst begge felter", "error");
+            
+            try {
+                await createUserWithEmailAndPassword(auth, email, password);
+                showToast("Din konto er oprettet! 🌱", "success");
+            } catch (error) {
+                if(error.code === 'auth/weak-password') showToast("Adgangskode skal være mindst 6 tegn.", "error");
+                else if(error.code === 'auth/email-already-in-use') showToast("Email er allerede i brug.", "error");
+                else showToast("Fejl ved oprettelse.", "error");
+            }
+        }
+
+        async function handleLogout() {
+            try {
+                await signOut(auth);
+                document.getElementById('auth-email').value = '';
+                document.getElementById('auth-password').value = '';
+            } catch (error) {
+                showToast("Fejl ved log ud", "error");
+            }
+        }
+
+        // APP LOGIC
         function getDaysAgo(timestamp) {
             return Math.floor((Date.now() - timestamp) / 86400000);
         }
@@ -246,10 +313,10 @@
                                 ${statusHTML}
                             </div>
                             <div class="absolute top-3 left-3 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                                <button onclick="openPlantModal('${p.id}')" class="bg-white/90 backdrop-blur text-gray-700 p-1.5 rounded-lg shadow hover:text-emerald-600 hover:bg-white transition-colors" title="Rediger">
+                                <button onclick="openPlantModal('${p.id}')" class="bg-white/90 backdrop-blur text-gray-700 p-1.5 rounded-lg shadow hover:text-emerald-600 transition-colors">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
                                 </button>
-                                <button onclick="openDeleteModal('${p.id}')" class="bg-white/90 backdrop-blur text-gray-700 p-1.5 rounded-lg shadow hover:text-red-600 hover:bg-white transition-colors" title="Slet">
+                                <button onclick="openDeleteModal('${p.id}')" class="bg-white/90 backdrop-blur text-gray-700 p-1.5 rounded-lg shadow hover:text-red-600 transition-colors">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                                 </button>
                             </div>
@@ -307,7 +374,6 @@
                 await updateDoc(plantRef, updates);
                 showToast(`${plant.name} er blevet passet! 🪴`, "success");
             } catch (error) {
-                console.error("Error updating plant: ", error);
                 showToast("Fejl ved opdatering", "error");
             }
         }
@@ -315,18 +381,12 @@
         function showToast(message, type = "info") {
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
-            
             const bgColor = type === 'success' ? 'bg-emerald-600' : (type === 'error' ? 'bg-red-600' : 'bg-gray-800');
-            
             toast.className = `${bgColor} text-white px-4 py-3 rounded-lg shadow-lg flex items-center gap-2 transform transition-all duration-300 translate-y-4 opacity-0 pointer-events-auto`;
             toast.innerHTML = `<span class="font-medium text-sm">${message}</span>`;
             
             container.appendChild(toast);
-            
-            setTimeout(() => {
-                toast.classList.remove('translate-y-4', 'opacity-0');
-            }, 10);
-            
+            setTimeout(() => toast.classList.remove('translate-y-4', 'opacity-0'), 10);
             setTimeout(() => {
                 toast.classList.add('opacity-0', 'scale-95');
                 setTimeout(() => toast.remove(), 300);
@@ -334,10 +394,6 @@
         }
 
         function openPlantModal(id = null) {
-            const modal = document.getElementById('plant-modal');
-            const title = document.getElementById('modal-title');
-            
-            // Reset form
             document.getElementById('p-id').value = '';
             document.getElementById('p-name').value = '';
             document.getElementById('p-water').value = '';
@@ -345,13 +401,12 @@
             document.getElementById('p-notes').value = '';
             document.getElementById('p-image').value = '';
             document.getElementById('image-preview').classList.add('hidden');
-            document.getElementById('image-preview').src = '';
             activeImageBase64 = "";
 
             if (id) {
                 const plant = plants.find(p => p.id === id);
                 if(plant) {
-                    title.innerText = "Rediger Plante";
+                    document.getElementById('modal-title').innerText = "Rediger Plante";
                     document.getElementById('p-id').value = plant.id;
                     document.getElementById('p-name').value = plant.name;
                     document.getElementById('p-water').value = plant.waterInterval;
@@ -365,15 +420,13 @@
                     }
                 }
             } else {
-                title.innerText = "Tilføj ny plante";
+                document.getElementById('modal-title').innerText = "Tilføj ny plante";
             }
-
-            modal.classList.remove('hidden');
+            document.getElementById('plant-modal').classList.remove('hidden');
         }
 
         function closePlantModal() {
-            const modal = document.getElementById('plant-modal');
-            modal.classList.add('hidden');
+            document.getElementById('plant-modal').classList.add('hidden');
         }
 
         function previewImage(event) {
@@ -386,7 +439,6 @@
                 img.onload = function() {
                     const canvas = document.createElement('canvas');
                     const ctx = canvas.getContext('2d');
-                    
                     const MAX_WIDTH = 500;
                     const MAX_HEIGHT = 500;
                     let width = img.width;
@@ -403,13 +455,11 @@
                             height = MAX_HEIGHT;
                         }
                     }
-
                     canvas.width = width;
                     canvas.height = height;
                     ctx.drawImage(img, 0, 0, width, height);
                     
                     activeImageBase64 = canvas.toDataURL('image/jpeg', 0.7);
-                    
                     const preview = document.getElementById('image-preview');
                     preview.src = activeImageBase64;
                     preview.classList.remove('hidden');
@@ -420,6 +470,8 @@
         }
 
         async function savePlantData() {
+            if(!auth.currentUser) return showToast("Du skal være logget ind!", "error");
+
             const id = document.getElementById('p-id').value;
             const name = document.getElementById('p-name').value.trim();
             const water = parseInt(document.getElementById('p-water').value);
@@ -444,6 +496,7 @@
                     showToast(`${name} blev opdateret!`, "success");
                 } else {
                     await addDoc(collection(db, 'plants'), {
+                        userId: auth.currentUser.uid, // Tildel planten til den aktuelle bruger
                         name: name,
                         waterInterval: water,
                         fertInterval: fert,
@@ -456,8 +509,8 @@
                 }
                 closePlantModal();
             } catch (error) {
-                console.error("Error saving plant: ", error);
-                showToast("Fejl ved gemning af data", "error");
+                console.error(error);
+                showToast("Fejl ved gemning. Tjek dine rettigheder.", "error");
             }
         }
 
@@ -479,7 +532,6 @@
                     closeDeleteModal();
                     showToast(`${plantName} blev slettet.`, "info");
                 } catch (error) {
-                    console.error("Error deleting document: ", error);
                     showToast("Fejl ved sletning", "error");
                 }
             }
@@ -488,14 +540,9 @@
         function requestNotificationPermission() {
             if ("Notification" in window) {
                 Notification.requestPermission().then(permission => {
-                    if(permission === "granted") {
-                        showToast("Notifikationer er aktiveret!", "success");
-                    } else {
-                        showToast("Notifikationer blev afvist.", "error");
-                    }
+                    if(permission === "granted") showToast("Notifikationer er aktiveret!", "success");
+                    else showToast("Notifikationer blev afvist.", "error");
                 });
-            } else {
-                showToast("Din browser understøtter ikke notifikationer.", "error");
             }
         }
 
@@ -504,9 +551,7 @@
             
             let alerts = [];
             plants.forEach(p => {
-                if (getDaysAgo(p.lastWatered) >= p.waterInterval) {
-                    alerts.push(p.name);
-                }
+                if (getDaysAgo(p.lastWatered) >= p.waterInterval) alerts.push(p.name);
             });
 
             if (alerts.length > 0) {
@@ -517,7 +562,9 @@
             }
         }
 
-        // Expose functions to the global window object so HTML onClick handlers can reach them
+        window.handleLogin = handleLogin;
+        window.handleSignup = handleSignup;
+        window.handleLogout = handleLogout;
         window.requestNotificationPermission = requestNotificationPermission;
         window.openPlantModal = openPlantModal;
         window.closePlantModal = closePlantModal;
@@ -527,18 +574,6 @@
         window.closeDeleteModal = closeDeleteModal;
         window.confirmDelete = confirmDelete;
         window.waterPlant = waterPlant;
-
-        // Initialize App & Listen to Firestore Realtime Updates
-        const plantsCol = collection(db, 'plants');
-        onSnapshot(plantsCol, (snapshot) => {
-            plants = [];
-            snapshot.forEach((doc) => {
-                plants.push({ id: doc.id, ...doc.data() });
-            });
-            renderPlants();
-        });
-        
-        setTimeout(checkNotifications, 3000);
 
     </script>
 </body>
