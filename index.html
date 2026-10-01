@@ -37,7 +37,7 @@
 <body class="bg-emerald-50 text-slate-800 min-h-screen relative">
 
     <!-- LOGIN SCREEN -->
-    <div id="auth-container" class="min-h-screen flex items-center justify-center p-4 z-50 bg-emerald-50">
+    <div id="auth-container" class="min-h-screen flex items-center justify-center p-4 z-50 bg-emerald-50 hidden">
         <div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md border border-emerald-100">
             <div class="text-center mb-8">
                 <span class="text-5xl block mb-4">🌱</span>
@@ -57,6 +57,7 @@
                 
                 <div class="pt-4 flex flex-col gap-3">
                     <button onclick="handleLogin()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2.5 rounded-lg transition-colors shadow-sm">Log ind</button>
+                    <!-- Opret-knappen er bevaret, men du kan slette den, da du kun er én bruger -->
                     <button onclick="handleSignup()" class="w-full bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 font-medium py-2.5 rounded-lg transition-colors">Opret ny konto</button>
                 </div>
             </div>
@@ -173,8 +174,8 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
-        import { getFirestore, collection, onSnapshot, addDoc, updateDoc, deleteDoc, doc, query, where } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
-        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
+        import { getFirestore, collection, onSnapshot, addDoc, updateDoc, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAuXoKwdJw4t0Z7AcFxD9sgB1obLXwvuhE",
@@ -189,6 +190,10 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const auth = getAuth(app);
+        
+        // Sæt eksplicit persistence til at huske login på tværs af sessioner
+        setPersistence(auth, browserLocalPersistence)
+            .catch((error) => console.error("Error setting persistence:", error));
 
         const defaultSVG = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" fill="none"><rect width="400" height="300" fill="%23d1fae5"/><path d="M200 250c0-60-40-100-40-150s20-60 40-70c20 10 40 20 40 70s-40 90-40 150z" fill="%2310b981" opacity="0.8"/><path d="M200 250c0-40-20-80-20-120s10-40 20-50c10 10 20 10 20 50s-20 80-20 120z" fill="%23059669"/></svg>`;
 
@@ -203,15 +208,14 @@
                 document.getElementById('auth-container').classList.add('hidden');
                 document.getElementById('app-container').classList.remove('hidden');
                 
-                // Fetch ONLY the plants belonging to the logged in user
-                const q = query(collection(db, 'plants'), where("userId", "==", user.uid));
-                unsubscribePlants = onSnapshot(q, (snapshot) => {
+                // Henter ALLE planter fra 'plants' kollektionen, da der kun er dig som bruger
+                unsubscribePlants = onSnapshot(collection(db, 'plants'), (snapshot) => {
                     plants = [];
                     snapshot.forEach((doc) => {
                         plants.push({ id: doc.id, ...doc.data() });
                     });
                     renderPlants();
-                    setTimeout(checkNotifications, 2000); // Check notifications when data loads
+                    setTimeout(checkNotifications, 2000);
                 });
             } else {
                 document.getElementById('auth-container').classList.remove('hidden');
@@ -495,8 +499,8 @@
                     });
                     showToast(`${name} blev opdateret!`, "success");
                 } else {
+                    // Vi gemmer ikke længere userId, da du er den eneste bruger på hele databasen
                     await addDoc(collection(db, 'plants'), {
-                        userId: auth.currentUser.uid, // Tildel planten til den aktuelle bruger
                         name: name,
                         waterInterval: water,
                         fertInterval: fert,
