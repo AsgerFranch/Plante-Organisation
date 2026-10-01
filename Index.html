@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plante Vagt</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Poppins', 'sans-serif'],
+                    },
+                    colors: {
+                        emerald: {
+                            50: '#ecfdf5',
+                            100: '#d1fae5',
+                            500: '#10b981',
+                            600: '#059669',
+                            700: '#047857',
+                            900: '#064e3b',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom scrollbar for a polished look */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #ecfdf5; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #a7f3d0; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #34d399; 
+        }
+        /* Smooth transitions */
+        .modal-enter {
+            opacity: 0;
+            transform: scale(0.95);
+        }
+        .modal-enter-active {
+            opacity: 1;
+            transform: scale(1);
+            transition: opacity 200ms, transform 200ms ease-out;
+        }
+        .modal-leave {
+            opacity: 1;
+            transform: scale(1);
+        }
+        .modal-leave-active {
+            opacity: 0;
+            transform: scale(0.95);
+            transition: opacity 150ms, transform 150ms ease-in;
+        }
+    </style>
+</head>
+<body class="bg-emerald-50 text-slate-800 min-h-screen relative pb-24 md:pb-8">
+
+    <header class="bg-white shadow-sm sticky top-0 z-30">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <span class="text-2xl">🌱</span>
+                <h1 class="text-xl font-bold text-emerald-900 tracking-tight">Mine Planter</h1>
+            </div>
+            <div class="flex gap-3">
+                <button onclick="requestNotificationPermission()" class="hidden sm:flex items-center gap-2 text-sm font-medium text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 px-3 py-2 rounded-lg transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>
+                    Notifikationer
+                </button>
+                <button onclick="openPlantModal()" class="hidden sm:flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors shadow-sm">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" /></svg>
+                    Tilføj Plante
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div id="plant-list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Plant cards will be injected here via JS -->
+        </div>
+    </main>
+
+    <!-- Floating Action Button for Mobile -->
+    <button onclick="openPlantModal()" class="sm:hidden fixed bottom-6 right-6 h-14 w-14 bg-emerald-600 text-white rounded-full shadow-lg flex items-center justify-center hover:bg-emerald-700 transition-colors z-30">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
+    </button>
+
+    <div id="plant-modal" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity" onclick="closePlantModal()"></div>
+        <div class="fixed inset-0 flex items-center justify-center p-4">
+            <div class="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden transform transition-all relative">
+                <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-emerald-50/50">
+                    <h3 id="modal-title" class="text-lg font-semibold text-emerald-900">Tilføj ny plante</h3>
+                    <button onclick="closePlantModal()" class="text-gray-400 hover:text-gray-600 transition-colors">
+                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                    </button>
+                </div>
+                <div class="p-6 space-y-4">
+                    <input type="hidden" id="p-id">
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Plantens navn</label>
+                        <input type="text" id="p-name" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all" placeholder="fx. Rosmarin">
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Vanding (dage)</label>
+                            <input type="number" id="p-water" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="fx. 4" min="1">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Gødning (dage)</label>
+                            <input type="number" id="p-fert" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="fx. 14" min="1">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Kommentarer/Specielle forhold</label>
+                        <textarea id="p-notes" rows="2" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all resize-none" placeholder="fx. Trives bedst i indirekte lys..."></textarea>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Billede</label>
+                        <div class="flex items-center justify-center w-full">
+                            <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-emerald-200 rounded-lg cursor-pointer bg-emerald-50 hover:bg-emerald-100 transition-colors">
+                                <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                                    <svg class="w-8 h-8 mb-2 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                                    <p class="mb-2 text-sm text-gray-500"><span class="font-semibold">Klik for at uploade</span></p>
+                                </div>
+                                <input id="p-image" type="file" class="hidden" accept="image/*" onchange="previewImage(event)" />
+                            </label>
+                        </div>
+                        <img id="image-preview" class="hidden mt-3 w-full h-32 object-cover rounded-lg border border-gray-200">
+                    </div>
+                </div>
+                <div class="px-6 py-4 border-t border-gray-100 flex justify-end gap-3 bg-gray-50">
+                    <button onclick="closePlantModal()" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">Annuller</button>
+                    <button onclick="savePlantData()" class="px-4 py-2 text-sm font-medium text-white bg-emerald-600 border border-transparent rounded-lg hover:bg-emerald-700 transition-colors shadow-sm">Gem Plante</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="delete-modal" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity" onclick="closeDeleteModal()"></div>
+        <div class="fixed inset-0 flex items-center justify-center p-4">
+            <div class="bg-white rounded-2xl shadow-xl w-full max-w-sm overflow-hidden transform transition-all relative p-6 text-center">
+                <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                </div>
+                <h3 class="text-lg font-semibold text-gray-900 mb-2">Slet Plante?</h3>
+                <p class="text-sm text-gray-500 mb-6">Er du sikker på, at du vil slette denne plante? Dette kan ikke fortrydes.</p>
+                <div class="flex justify-center gap-3">
+                    <button onclick="closeDeleteModal()" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors flex-1">Annuller</button>
+                    <button id="confirm-delete-btn" onclick="confirmDelete()" class="px-4 py-2 text-sm font-medium text-white bg-red-600 border border-transparent rounded-lg hover:bg-red-700 transition-colors shadow-sm flex-1">Slet</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification Container -->
+    <div id="toast-container" class="fixed bottom-20 sm:bottom-6 left-1/2 transform -translate-x-1/2 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
+        import { getFirestore, collection, onSnapshot, addDoc, updateDoc, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
+
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyAuXoKwdJw4t0Z7AcFxD9sgB1obLXwvuhE",
+            authDomain: "planteorg.firebaseapp.com",
+            projectId: "planteorg",
+            storageBucket: "planteorg.firebasestorage.app",
+            messagingSenderId: "541919073169",
+            appId: "1:541919073169:web:0ce8328fad7fa58d654030",
+            measurementId: "G-G7PEWNP7BH"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        const defaultSVG = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" fill="none"><rect width="400" height="300" fill="%23d1fae5"/><path d="M200 250c0-60-40-100-40-150s20-60 40-70c20 10 40 20 40 70s-40 90-40 150z" fill="%2310b981" opacity="0.8"/><path d="M200 250c0-40-20-80-20-120s10-40 20-50c10 10 20 10 20 50s-20 80-20 120z" fill="%23059669"/></svg>`;
+
+        let plants = [];
+        let plantToDeleteId = null;
+        let activeImageBase64 = "";
+
+        // Core Functions
+        function getDaysAgo(timestamp) {
+            return Math.floor((Date.now() - timestamp) / 86400000);
+        }
+
+        function formatDaysText(days) {
+            if (days === 0) return "I dag";
+            if (days === 1) return "I går";
+            return `For ${days} dage siden`;
+        }
+
+        function renderPlants() {
+            const container = document.getElementById('plant-list');
+            container.innerHTML = '';
+
+            if (plants.length === 0) {
+                container.innerHTML = `
+                    <div class="col-span-full py-12 text-center text-gray-400 bg-white rounded-2xl border border-dashed border-gray-200">
+                        <svg class="mx-auto h-12 w-12 text-gray-300 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
+                        <p>Du har ingen planter endnu. Tilføj en for at komme i gang!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            plants.forEach(p => {
+                const daysSinceWater = getDaysAgo(p.lastWatered);
+                const daysSinceFert = getDaysAgo(p.lastFert);
+                
+                const needsWater = daysSinceWater >= p.waterInterval;
+                const needsFert = p.fertInterval ? (daysSinceFert >= p.fertInterval) : false;
+
+                const imgSrc = p.img ? p.img : defaultSVG;
+
+                let statusHTML = '';
+                if (needsWater) {
+                    statusHTML += `<span class="bg-red-100 text-red-700 text-xs font-semibold px-2.5 py-0.5 rounded flex items-center gap-1 shadow-sm"><span class="w-1.5 h-1.5 bg-red-600 rounded-full animate-pulse"></span>Vand nu</span>`;
+                }
+                if (needsFert) {
+                    statusHTML += `<span class="bg-amber-100 text-amber-700 text-xs font-semibold px-2.5 py-0.5 rounded flex items-center gap-1 shadow-sm"><span class="w-1.5 h-1.5 bg-amber-600 rounded-full"></span>Gødning nu</span>`;
+                }
+
+                container.innerHTML += `
+                    <div class="bg-white rounded-2xl shadow-sm hover:shadow-md border border-emerald-100 overflow-hidden transition-all duration-300 flex flex-col group">
+                        <div class="relative h-48 w-full bg-emerald-50 overflow-hidden">
+                            <img src="${imgSrc}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" alt="${p.name}">
+                            <div class="absolute top-3 right-3 flex flex-col items-end gap-2">
+                                ${statusHTML}
+                            </div>
+                            <div class="absolute top-3 left-3 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                                <button onclick="openPlantModal('${p.id}')" class="bg-white/90 backdrop-blur text-gray-700 p-1.5 rounded-lg shadow hover:text-emerald-600 hover:bg-white transition-colors" title="Rediger">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                                </button>
+                                <button onclick="openDeleteModal('${p.id}')" class="bg-white/90 backdrop-blur text-gray-700 p-1.5 rounded-lg shadow hover:text-red-600 hover:bg-white transition-colors" title="Slet">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="p-5 flex flex-col flex-grow">
+                            <h3 class="text-xl font-bold text-slate-800 mb-3">${p.name}</h3>
+                            
+                            ${p.notes ? `
+                            <div class="mb-4 text-sm text-gray-600 bg-emerald-50/50 p-3 rounded-lg border border-emerald-100/50 italic flex gap-2 items-start">
+                                <svg class="w-4 h-4 text-emerald-500 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                <p class="leading-relaxed">${p.notes}</p>
+                            </div>
+                            ` : ''}
+                            
+                            <div class="space-y-2 mb-6 flex-grow text-sm">
+                                <div class="flex items-center justify-between p-2 rounded-lg ${needsWater ? 'bg-red-50 text-red-700' : 'bg-emerald-50 text-emerald-800'}">
+                                    <span class="flex items-center gap-1.5 font-medium"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"></path></svg> Vandet:</span>
+                                    <span>${formatDaysText(daysSinceWater)}</span>
+                                </div>
+                                ${p.fertInterval ? `
+                                <div class="flex items-center justify-between p-2 rounded-lg ${needsFert ? 'bg-amber-50 text-amber-700' : 'bg-blue-50 text-blue-800'}">
+                                    <span class="flex items-center gap-1.5 font-medium"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg> Gødet:</span>
+                                    <span>${formatDaysText(daysSinceFert)}</span>
+                                </div>
+                                ` : ''}
+                            </div>
+                            
+                            <div class="grid grid-cols-2 gap-2 mt-auto">
+                                <button onclick="waterPlant('${p.id}', false)" class="flex items-center justify-center gap-1 bg-emerald-100 hover:bg-emerald-200 text-emerald-800 font-medium py-2 px-2 rounded-lg transition-colors text-sm">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"></path></svg>
+                                    Vand
+                                </button>
+                                <button onclick="waterPlant('${p.id}', true)" class="flex items-center justify-center gap-1 ${p.fertInterval ? 'bg-emerald-600 hover:bg-emerald-700 text-white' : 'bg-gray-100 text-gray-400 cursor-not-allowed'} font-medium py-2 px-2 rounded-lg transition-colors text-sm" ${!p.fertInterval ? 'disabled' : ''}>
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
+                                    + Gødning
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        async function waterPlant(id, withFertilizer) {
+            const plant = plants.find(p => p.id === id);
+            if (!plant) return;
+            
+            try {
+                const plantRef = doc(db, 'plants', id);
+                const updates = { lastWatered: Date.now() };
+                if(withFertilizer && plant.fertInterval) {
+                    updates.lastFert = Date.now();
+                }
+                
+                await updateDoc(plantRef, updates);
+                showToast(`${plant.name} er blevet passet! 🪴`, "success");
+            } catch (error) {
+                console.error("Error updating plant: ", error);
+                showToast("Fejl ved opdatering", "error");
+            }
+        }
+
+        function showToast(message, type = "info") {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            
+            const bgColor = type === 'success' ? 'bg-emerald-600' : (type === 'error' ? 'bg-red-600' : 'bg-gray-800');
+            
+            toast.className = `${bgColor} text-white px-4 py-3 rounded-lg shadow-lg flex items-center gap-2 transform transition-all duration-300 translate-y-4 opacity-0 pointer-events-auto`;
+            toast.innerHTML = `<span class="font-medium text-sm">${message}</span>`;
+            
+            container.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.classList.remove('translate-y-4', 'opacity-0');
+            }, 10);
+            
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'scale-95');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        function openPlantModal(id = null) {
+            const modal = document.getElementById('plant-modal');
+            const title = document.getElementById('modal-title');
+            
+            // Reset form
+            document.getElementById('p-id').value = '';
+            document.getElementById('p-name').value = '';
+            document.getElementById('p-water').value = '';
+            document.getElementById('p-fert').value = '';
+            document.getElementById('p-notes').value = '';
+            document.getElementById('p-image').value = '';
+            document.getElementById('image-preview').classList.add('hidden');
+            document.getElementById('image-preview').src = '';
+            activeImageBase64 = "";
+
+            if (id) {
+                const plant = plants.find(p => p.id === id);
+                if(plant) {
+                    title.innerText = "Rediger Plante";
+                    document.getElementById('p-id').value = plant.id;
+                    document.getElementById('p-name').value = plant.name;
+                    document.getElementById('p-water').value = plant.waterInterval;
+                    document.getElementById('p-fert').value = plant.fertInterval || '';
+                    document.getElementById('p-notes').value = plant.notes || '';
+                    if (plant.img) {
+                        activeImageBase64 = plant.img;
+                        const preview = document.getElementById('image-preview');
+                        preview.src = plant.img;
+                        preview.classList.remove('hidden');
+                    }
+                }
+            } else {
+                title.innerText = "Tilføj ny plante";
+            }
+
+            modal.classList.remove('hidden');
+        }
+
+        function closePlantModal() {
+            const modal = document.getElementById('plant-modal');
+            modal.classList.add('hidden');
+        }
+
+        function previewImage(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    
+                    const MAX_WIDTH = 500;
+                    const MAX_HEIGHT = 500;
+                    let width = img.width;
+                    let height = img.height;
+
+                    if (width > height) {
+                        if (width > MAX_WIDTH) {
+                            height *= MAX_WIDTH / width;
+                            width = MAX_WIDTH;
+                        }
+                    } else {
+                        if (height > MAX_HEIGHT) {
+                            width *= MAX_HEIGHT / height;
+                            height = MAX_HEIGHT;
+                        }
+                    }
+
+                    canvas.width = width;
+                    canvas.height = height;
+                    ctx.drawImage(img, 0, 0, width, height);
+                    
+                    activeImageBase64 = canvas.toDataURL('image/jpeg', 0.7);
+                    
+                    const preview = document.getElementById('image-preview');
+                    preview.src = activeImageBase64;
+                    preview.classList.remove('hidden');
+                }
+                img.src = e.target.result;
+            }
+            reader.readAsDataURL(file);
+        }
+
+        async function savePlantData() {
+            const id = document.getElementById('p-id').value;
+            const name = document.getElementById('p-name').value.trim();
+            const water = parseInt(document.getElementById('p-water').value);
+            const fert = document.getElementById('p-fert').value ? parseInt(document.getElementById('p-fert').value) : null;
+            const notes = document.getElementById('p-notes').value.trim();
+
+            if(!name || !water) {
+                showToast("Udfyld venligst navn og vande-interval!", "error");
+                return;
+            }
+
+            try {
+                if (id) {
+                    const plantRef = doc(db, 'plants', id);
+                    await updateDoc(plantRef, {
+                        name: name,
+                        waterInterval: water,
+                        fertInterval: fert,
+                        notes: notes,
+                        img: activeImageBase64
+                    });
+                    showToast(`${name} blev opdateret!`, "success");
+                } else {
+                    await addDoc(collection(db, 'plants'), {
+                        name: name,
+                        waterInterval: water,
+                        fertInterval: fert,
+                        notes: notes,
+                        lastWatered: Date.now(),
+                        lastFert: Date.now(),
+                        img: activeImageBase64
+                    });
+                    showToast(`${name} blev tilføjet!`, "success");
+                }
+                closePlantModal();
+            } catch (error) {
+                console.error("Error saving plant: ", error);
+                showToast("Fejl ved gemning af data", "error");
+            }
+        }
+
+        function openDeleteModal(id) {
+            plantToDeleteId = id;
+            document.getElementById('delete-modal').classList.remove('hidden');
+        }
+
+        function closeDeleteModal() {
+            plantToDeleteId = null;
+            document.getElementById('delete-modal').classList.add('hidden');
+        }
+
+        async function confirmDelete() {
+            if (plantToDeleteId) {
+                const plantName = plants.find(p => p.id === plantToDeleteId)?.name || "Planten";
+                try {
+                    await deleteDoc(doc(db, 'plants', plantToDeleteId));
+                    closeDeleteModal();
+                    showToast(`${plantName} blev slettet.`, "info");
+                } catch (error) {
+                    console.error("Error deleting document: ", error);
+                    showToast("Fejl ved sletning", "error");
+                }
+            }
+        }
+
+        function requestNotificationPermission() {
+            if ("Notification" in window) {
+                Notification.requestPermission().then(permission => {
+                    if(permission === "granted") {
+                        showToast("Notifikationer er aktiveret!", "success");
+                    } else {
+                        showToast("Notifikationer blev afvist.", "error");
+                    }
+                });
+            } else {
+                showToast("Din browser understøtter ikke notifikationer.", "error");
+            }
+        }
+
+        function checkNotifications() {
+            if (!("Notification" in window) || Notification.permission !== "granted") return;
+            
+            let alerts = [];
+            plants.forEach(p => {
+                if (getDaysAgo(p.lastWatered) >= p.waterInterval) {
+                    alerts.push(p.name);
+                }
+            });
+
+            if (alerts.length > 0) {
+                new Notification("🌱 Plante Vagt", {
+                    body: `Vandings-tid! Disse planter er tørstige: ${alerts.join(', ')}`,
+                    icon: "data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌱</text></svg>"
+                });
+            }
+        }
+
+        // Expose functions to the global window object so HTML onClick handlers can reach them
+        window.requestNotificationPermission = requestNotificationPermission;
+        window.openPlantModal = openPlantModal;
+        window.closePlantModal = closePlantModal;
+        window.previewImage = previewImage;
+        window.savePlantData = savePlantData;
+        window.openDeleteModal = openDeleteModal;
+        window.closeDeleteModal = closeDeleteModal;
+        window.confirmDelete = confirmDelete;
+        window.waterPlant = waterPlant;
+
+        // Initialize App & Listen to Firestore Realtime Updates
+        const plantsCol = collection(db, 'plants');
+        onSnapshot(plantsCol, (snapshot) => {
+            plants = [];
+            snapshot.forEach((doc) => {
+                plants.push({ id: doc.id, ...doc.data() });
+            });
+            renderPlants();
+        });
+        
+        setTimeout(checkNotifications, 3000);
+
+    </script>
+</body>
+</html>
