@@ -55,10 +55,8 @@
                     <input type="password" id="auth-password" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="••••••••">
                 </div>
                 
-                <div class="pt-4 flex flex-col gap-3">
+                <div class="pt-4">
                     <button onclick="handleLogin()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2.5 rounded-lg transition-colors shadow-sm">Log ind</button>
-                    <!-- Opret-knappen er bevaret, men du kan slette den, da du kun er én bruger -->
-                    <button onclick="handleSignup()" class="w-full bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 font-medium py-2.5 rounded-lg transition-colors">Opret ny konto</button>
                 </div>
             </div>
         </div>
@@ -73,7 +71,7 @@
                     <h1 class="text-xl font-bold text-emerald-900 tracking-tight">Mine Planter</h1>
                 </div>
                 <div class="flex items-center gap-3">
-                    <button onclick="requestNotificationPermission()" class="hidden sm:flex items-center gap-2 text-sm font-medium text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 px-3 py-2 rounded-lg transition-colors">
+                    <button onclick="requestNotificationPermission()" class="hidden sm:flex items-center gap-2 text-sm font-medium text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 px-3 py-2 rounded-lg transition-colors" title="Slå notifikationer til">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>
                     </button>
                     <button onclick="openPlantModal()" class="hidden sm:flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors shadow-sm">
@@ -89,6 +87,18 @@
         </header>
 
         <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <!-- Season Toggle UI -->
+            <div class="flex flex-col sm:flex-row justify-between items-center mb-8 gap-4 bg-white p-4 rounded-2xl shadow-sm border border-emerald-100">
+                <div class="text-center sm:text-left">
+                    <h2 class="text-lg font-semibold text-slate-800">Sæson-indstilling</h2>
+                    <p class="text-sm text-gray-500">Skift for at ændre vandingsbehov og slå gødning til/fra.</p>
+                </div>
+                <div class="inline-flex bg-emerald-100 p-1.5 rounded-full cursor-pointer shadow-inner" onclick="toggleSeason()">
+                    <div id="btn-summer" class="px-5 py-2 text-sm font-semibold rounded-full transition-all duration-300">☀️ Sommer</div>
+                    <div id="btn-winter" class="px-5 py-2 text-sm font-semibold rounded-full transition-all duration-300">❄️ Vinter</div>
+                </div>
+            </div>
+            
             <div id="plant-list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 <!-- Plant cards will be injected here via JS -->
             </div>
@@ -111,22 +121,30 @@
                         <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
                     </button>
                 </div>
-                <div class="p-6 space-y-4">
+                <div class="p-6 space-y-4 max-h-[70vh] overflow-y-auto">
                     <input type="hidden" id="p-id">
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Plantens navn</label>
                         <input type="text" id="p-name" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-emerald-500 outline-none">
                     </div>
+                    
                     <div class="grid grid-cols-2 gap-4">
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Vanding (dage)</label>
-                            <input type="number" id="p-water" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-emerald-500 outline-none" min="1">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Vanding Sommer (dage)</label>
+                            <input type="number" id="p-water-summer" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-emerald-500 outline-none" min="1" placeholder="April - Sept">
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Gødning (dage)</label>
-                            <input type="number" id="p-fert" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-emerald-500 outline-none" min="1">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Vanding Vinter (dage)</label>
+                            <input type="number" id="p-water-winter" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-emerald-500 outline-none" min="1" placeholder="Okt - Marts">
                         </div>
                     </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Gødning (dage)</label>
+                        <input type="number" id="p-fert" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-emerald-500 outline-none" min="1" placeholder="Valgfrit">
+                        <p class="text-xs text-gray-500 mt-1">Gødning gælder kun og vises kun i sommerperioden.</p>
+                    </div>
+
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Kommentarer</label>
                         <textarea id="p-notes" rows="2" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-emerald-500 outline-none resize-none"></textarea>
@@ -175,7 +193,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
         import { getFirestore, collection, onSnapshot, addDoc, updateDoc, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
-        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
+        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAuXoKwdJw4t0Z7AcFxD9sgB1obLXwvuhE",
@@ -183,17 +201,14 @@
             projectId: "planteorg",
             storageBucket: "planteorg.firebasestorage.app",
             messagingSenderId: "541919073169",
-            appId: "1:541919073169:web:0ce8328fad7fa58d654030",
-            measurementId: "G-G7PEWNP7BH"
+            appId: "1:541919073169:web:0ce8328fad7fa58d654030"
         };
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const auth = getAuth(app);
         
-        // Sæt eksplicit persistence til at huske login på tværs af sessioner
-        setPersistence(auth, browserLocalPersistence)
-            .catch((error) => console.error("Error setting persistence:", error));
+        setPersistence(auth, browserLocalPersistence).catch(console.error);
 
         const defaultSVG = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" fill="none"><rect width="400" height="300" fill="%23d1fae5"/><path d="M200 250c0-60-40-100-40-150s20-60 40-70c20 10 40 20 40 70s-40 90-40 150z" fill="%2310b981" opacity="0.8"/><path d="M200 250c0-40-20-80-20-120s10-40 20-50c10 10 20 10 20 50s-20 80-20 120z" fill="%23059669"/></svg>`;
 
@@ -202,13 +217,17 @@
         let activeImageBase64 = "";
         let unsubscribePlants = null;
 
-        // AUTHENTICATION LOGIC
+        // Season Logic: Summer is April(3) to Sept(8)
+        const currentMonth = new Date().getMonth();
+        let currentSeason = (currentMonth >= 3 && currentMonth <= 8) ? 'summer' : 'winter';
+
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 document.getElementById('auth-container').classList.add('hidden');
                 document.getElementById('app-container').classList.remove('hidden');
                 
-                // Henter ALLE planter fra 'plants' kollektionen, da der kun er dig som bruger
+                updateSeasonToggleUI();
+                
                 unsubscribePlants = onSnapshot(collection(db, 'plants'), (snapshot) => {
                     plants = [];
                     snapshot.forEach((doc) => {
@@ -242,21 +261,6 @@
             }
         }
 
-        async function handleSignup() {
-            const email = document.getElementById('auth-email').value;
-            const password = document.getElementById('auth-password').value;
-            if(!email || !password) return showToast("Udfyld venligst begge felter", "error");
-            
-            try {
-                await createUserWithEmailAndPassword(auth, email, password);
-                showToast("Din konto er oprettet! 🌱", "success");
-            } catch (error) {
-                if(error.code === 'auth/weak-password') showToast("Adgangskode skal være mindst 6 tegn.", "error");
-                else if(error.code === 'auth/email-already-in-use') showToast("Email er allerede i brug.", "error");
-                else showToast("Fejl ved oprettelse.", "error");
-            }
-        }
-
         async function handleLogout() {
             try {
                 await signOut(auth);
@@ -267,7 +271,31 @@
             }
         }
 
-        // APP LOGIC
+        function toggleSeason() {
+            currentSeason = currentSeason === 'summer' ? 'winter' : 'summer';
+            updateSeasonToggleUI();
+            renderPlants();
+        }
+
+        function updateSeasonToggleUI() {
+            const btnSummer = document.getElementById('btn-summer');
+            const btnWinter = document.getElementById('btn-winter');
+            
+            if (currentSeason === 'summer') {
+                btnSummer.classList.add('bg-white', 'shadow', 'text-emerald-800');
+                btnSummer.classList.remove('text-emerald-600/70', 'hover:bg-emerald-200/50');
+                
+                btnWinter.classList.remove('bg-white', 'shadow', 'text-emerald-800');
+                btnWinter.classList.add('text-emerald-600/70', 'hover:bg-emerald-200/50');
+            } else {
+                btnWinter.classList.add('bg-white', 'shadow', 'text-emerald-800');
+                btnWinter.classList.remove('text-emerald-600/70', 'hover:bg-emerald-200/50');
+                
+                btnSummer.classList.remove('bg-white', 'shadow', 'text-emerald-800');
+                btnSummer.classList.add('text-emerald-600/70', 'hover:bg-emerald-200/50');
+            }
+        }
+
         function getDaysAgo(timestamp) {
             return Math.floor((Date.now() - timestamp) / 86400000);
         }
@@ -296,8 +324,15 @@
                 const daysSinceWater = getDaysAgo(p.lastWatered);
                 const daysSinceFert = getDaysAgo(p.lastFert);
                 
-                const needsWater = daysSinceWater >= p.waterInterval;
-                const needsFert = p.fertInterval ? (daysSinceFert >= p.fertInterval) : false;
+                // Determine active watering interval based on season. Fallback to old standard 'waterInterval' if new specific ones aren't set.
+                const activeWaterInterval = currentSeason === 'summer' 
+                    ? (p.waterIntervalSummer || p.waterInterval) 
+                    : (p.waterIntervalWinter || p.waterInterval);
+
+                const needsWater = activeWaterInterval ? (daysSinceWater >= activeWaterInterval) : false;
+                
+                // Fertilizer is strictly summer only
+                const needsFert = (currentSeason === 'summer' && p.fertInterval) ? (daysSinceFert >= p.fertInterval) : false;
 
                 const imgSrc = p.img ? p.img : defaultSVG;
 
@@ -308,6 +343,23 @@
                 if (needsFert) {
                     statusHTML += `<span class="bg-amber-100 text-amber-700 text-xs font-semibold px-2.5 py-0.5 rounded flex items-center gap-1 shadow-sm"><span class="w-1.5 h-1.5 bg-amber-600 rounded-full"></span>Gødning nu</span>`;
                 }
+
+                const fertHTML = (currentSeason === 'summer' && p.fertInterval) ? `
+                    <div class="flex items-center justify-between p-2 rounded-lg ${needsFert ? 'bg-amber-50 text-amber-700' : 'bg-blue-50 text-blue-800'}">
+                        <span class="flex items-center gap-1.5 font-medium"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg> Gødet:</span>
+                        <span>${formatDaysText(daysSinceFert)}</span>
+                    </div>
+                ` : '';
+
+                const fertButton = (currentSeason === 'summer' && p.fertInterval) ? `
+                    <button onclick="waterPlant('${p.id}', true)" class="flex items-center justify-center gap-1 bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2 px-2 rounded-lg transition-colors text-sm shadow-sm">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
+                        + Gødning
+                    </button>
+                ` : '';
+
+                // If fertilizer is disabled/hidden, make water button take full width.
+                const buttonsGridClass = (currentSeason === 'summer' && p.fertInterval) ? 'grid-cols-2' : 'grid-cols-1';
 
                 container.innerHTML += `
                     <div class="bg-white rounded-2xl shadow-sm hover:shadow-md border border-emerald-100 overflow-hidden transition-all duration-300 flex flex-col group">
@@ -340,23 +392,15 @@
                                     <span class="flex items-center gap-1.5 font-medium"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"></path></svg> Vandet:</span>
                                     <span>${formatDaysText(daysSinceWater)}</span>
                                 </div>
-                                ${p.fertInterval ? `
-                                <div class="flex items-center justify-between p-2 rounded-lg ${needsFert ? 'bg-amber-50 text-amber-700' : 'bg-blue-50 text-blue-800'}">
-                                    <span class="flex items-center gap-1.5 font-medium"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg> Gødet:</span>
-                                    <span>${formatDaysText(daysSinceFert)}</span>
-                                </div>
-                                ` : ''}
+                                ${fertHTML}
                             </div>
                             
-                            <div class="grid grid-cols-2 gap-2 mt-auto">
-                                <button onclick="waterPlant('${p.id}', false)" class="flex items-center justify-center gap-1 bg-emerald-100 hover:bg-emerald-200 text-emerald-800 font-medium py-2 px-2 rounded-lg transition-colors text-sm">
+                            <div class="grid ${buttonsGridClass} gap-2 mt-auto">
+                                <button onclick="waterPlant('${p.id}', false)" class="flex items-center justify-center gap-1 bg-emerald-100 hover:bg-emerald-200 text-emerald-800 font-medium py-2 px-2 rounded-lg transition-colors text-sm shadow-sm">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"></path></svg>
                                     Vand
                                 </button>
-                                <button onclick="waterPlant('${p.id}', true)" class="flex items-center justify-center gap-1 ${p.fertInterval ? 'bg-emerald-600 hover:bg-emerald-700 text-white' : 'bg-gray-100 text-gray-400 cursor-not-allowed'} font-medium py-2 px-2 rounded-lg transition-colors text-sm" ${!p.fertInterval ? 'disabled' : ''}>
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
-                                    + Gødning
-                                </button>
+                                ${fertButton}
                             </div>
                         </div>
                     </div>
@@ -371,7 +415,7 @@
             try {
                 const plantRef = doc(db, 'plants', id);
                 const updates = { lastWatered: Date.now() };
-                if(withFertilizer && plant.fertInterval) {
+                if(withFertilizer && plant.fertInterval && currentSeason === 'summer') {
                     updates.lastFert = Date.now();
                 }
                 
@@ -400,7 +444,8 @@
         function openPlantModal(id = null) {
             document.getElementById('p-id').value = '';
             document.getElementById('p-name').value = '';
-            document.getElementById('p-water').value = '';
+            document.getElementById('p-water-summer').value = '';
+            document.getElementById('p-water-winter').value = '';
             document.getElementById('p-fert').value = '';
             document.getElementById('p-notes').value = '';
             document.getElementById('p-image').value = '';
@@ -413,7 +458,11 @@
                     document.getElementById('modal-title').innerText = "Rediger Plante";
                     document.getElementById('p-id').value = plant.id;
                     document.getElementById('p-name').value = plant.name;
-                    document.getElementById('p-water').value = plant.waterInterval;
+                    
+                    // Use new fields, fallback to old single field if not present
+                    document.getElementById('p-water-summer').value = plant.waterIntervalSummer || plant.waterInterval || '';
+                    document.getElementById('p-water-winter').value = plant.waterIntervalWinter || plant.waterInterval || '';
+                    
                     document.getElementById('p-fert').value = plant.fertInterval || '';
                     document.getElementById('p-notes').value = plant.notes || '';
                     if (plant.img) {
@@ -478,12 +527,13 @@
 
             const id = document.getElementById('p-id').value;
             const name = document.getElementById('p-name').value.trim();
-            const water = parseInt(document.getElementById('p-water').value);
+            const waterSummer = parseInt(document.getElementById('p-water-summer').value);
+            const waterWinter = parseInt(document.getElementById('p-water-winter').value);
             const fert = document.getElementById('p-fert').value ? parseInt(document.getElementById('p-fert').value) : null;
             const notes = document.getElementById('p-notes').value.trim();
 
-            if(!name || !water) {
-                showToast("Udfyld venligst navn og vande-interval!", "error");
+            if(!name || !waterSummer || !waterWinter) {
+                showToast("Udfyld venligst navn og begge vandings-intervaller!", "error");
                 return;
             }
 
@@ -492,17 +542,20 @@
                     const plantRef = doc(db, 'plants', id);
                     await updateDoc(plantRef, {
                         name: name,
-                        waterInterval: water,
+                        waterIntervalSummer: waterSummer,
+                        waterIntervalWinter: waterWinter,
+                        waterInterval: waterSummer, // Keeping legacy field updated for safety
                         fertInterval: fert,
                         notes: notes,
                         img: activeImageBase64
                     });
                     showToast(`${name} blev opdateret!`, "success");
                 } else {
-                    // Vi gemmer ikke længere userId, da du er den eneste bruger på hele databasen
                     await addDoc(collection(db, 'plants'), {
                         name: name,
-                        waterInterval: water,
+                        waterIntervalSummer: waterSummer,
+                        waterIntervalWinter: waterWinter,
+                        waterInterval: waterSummer, 
                         fertInterval: fert,
                         notes: notes,
                         lastWatered: Date.now(),
@@ -555,7 +608,13 @@
             
             let alerts = [];
             plants.forEach(p => {
-                if (getDaysAgo(p.lastWatered) >= p.waterInterval) alerts.push(p.name);
+                const activeWaterInterval = currentSeason === 'summer' 
+                    ? (p.waterIntervalSummer || p.waterInterval) 
+                    : (p.waterIntervalWinter || p.waterInterval);
+                
+                if (activeWaterInterval && getDaysAgo(p.lastWatered) >= activeWaterInterval) {
+                    alerts.push(p.name);
+                }
             });
 
             if (alerts.length > 0) {
@@ -566,9 +625,10 @@
             }
         }
 
+        // Attach to window so HTML event handlers can use them
         window.handleLogin = handleLogin;
-        window.handleSignup = handleSignup;
         window.handleLogout = handleLogout;
+        window.toggleSeason = toggleSeason;
         window.requestNotificationPermission = requestNotificationPermission;
         window.openPlantModal = openPlantModal;
         window.closePlantModal = closePlantModal;
