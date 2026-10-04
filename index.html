@@ -5,190 +5,200 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Plante Vagt</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     fontFamily: {
-                        sans: ['Poppins', 'sans-serif'],
+                        sans: ['"Space Grotesk"', 'sans-serif'],
+                        mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace']
                     },
                     colors: {
-                        emerald: {
-                            50: '#ecfdf5',
-                            100: '#d1fae5',
-                            500: '#10b981',
-                            600: '#059669',
-                            700: '#047857',
-                            900: '#064e3b',
-                        }
+                        surface: '#f6f7f9',
+                        panel: '#ffffff',
+                        stroke: '#d4d4d8',
+                        'stroke-dark': '#71717a',
+                        ink: '#27272a',
+                        'ink-muted': '#71717a',
+                        charcoal: '#3f3f46'
                     }
                 }
             }
         }
     </script>
     <style>
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: #ecfdf5; }
-        ::-webkit-scrollbar-thumb { background: #a7f3d0; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #34d399; }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #f4f4f5; }
+        ::-webkit-scrollbar-thumb { background: #a1a1aa; }
+        ::-webkit-scrollbar-thumb:hover { background: #71717a; }
+        * { border-radius: 0 !important; } /* Kantet, arkitektonisk design */
     </style>
 </head>
-<body class="bg-emerald-50 text-slate-800 min-h-screen relative">
+<body class="bg-surface text-ink min-h-screen relative font-sans selection:bg-zinc-800 selection:text-white">
 
     <!-- LOGIN SCREEN -->
-    <div id="auth-container" class="min-h-screen flex items-center justify-center p-4 z-50 bg-emerald-50 hidden">
-        <div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md border border-emerald-100">
-            <div class="text-center mb-8">
-                <span class="text-5xl block mb-4">🌱</span>
-                <h1 class="text-2xl font-bold text-emerald-900">Plante Vagt</h1>
-                <p class="text-gray-500 text-sm mt-2">Log ind for at administrere dine planter</p>
+    <div id="auth-container" class="min-h-screen flex items-center justify-center p-4 z-50 bg-surface hidden">
+        <div class="bg-panel p-8 w-full max-w-md border border-stroke shadow-[3px_3px_0px_0px_rgba(24,24,27,0.06)]">
+            <div class="border-b border-stroke pb-5 mb-6 text-center">
+                <span class="text-4xl block mb-2 opacity-90">🪴</span>
+                <h1 class="text-xl font-bold tracking-tight text-ink">Plante Vagt</h1>
+                <p class="text-ink-muted text-xs font-mono uppercase tracking-wider mt-1">Log ind på oversigten</p>
             </div>
             
-            <div class="space-y-5">
+            <div class="space-y-4">
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                    <input type="email" id="auth-email" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="din@email.dk">
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-ink-muted mb-1">Email</label>
+                    <input type="email" id="auth-email" class="w-full border border-stroke px-3 py-2 bg-neutral-50/60 focus:bg-white focus:border-zinc-500 focus:outline-none text-sm text-ink transition-colors" placeholder="din@email.dk">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Adgangskode</label>
-                    <input type="password" id="auth-password" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="••••••••">
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-ink-muted mb-1">Adgangskode</label>
+                    <input type="password" id="auth-password" class="w-full border border-stroke px-3 py-2 bg-neutral-50/60 focus:bg-white focus:border-zinc-500 focus:outline-none text-sm text-ink transition-colors" placeholder="••••••••">
                 </div>
                 
-                <div class="pt-4">
-                    <button onclick="handleLogin()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2.5 rounded-lg transition-colors shadow-sm">Log ind</button>
+                <div class="pt-2">
+                    <button onclick="handleLogin()" class="w-full bg-zinc-800 hover:bg-zinc-700 text-white font-medium py-2.5 px-4 text-xs uppercase tracking-wider border border-zinc-800 transition-colors shadow-sm">
+                        Log ind
+                    </button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- MAIN APP SCREEN (Hidden by default) -->
-    <div id="app-container" class="hidden pb-24 md:pb-8">
-        <header class="bg-white shadow-sm sticky top-0 z-30">
+    <!-- MAIN APP SCREEN -->
+    <div id="app-container" class="hidden pb-24 md:pb-12">
+        <header class="bg-panel border-b border-stroke sticky top-0 z-30 shadow-[0_1px_2px_rgba(0,0,0,0.03)]">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-                <div class="flex items-center gap-2">
+                <div class="flex items-center gap-2.5">
                     <span class="text-2xl">🌱</span>
-                    <h1 class="text-xl font-bold text-emerald-900 tracking-tight">Mine Planter</h1>
+                    <h1 class="text-lg sm:text-xl font-bold tracking-tight text-ink">Plante Vagt</h1>
+                    <span class="hidden sm:inline-block text-[11px] font-mono border border-stroke px-2 py-0.5 bg-neutral-50 text-ink-muted uppercase">Arkiv</span>
                 </div>
-                <div class="flex items-center gap-3">
-                    <button onclick="requestNotificationPermission()" class="hidden sm:flex items-center gap-2 text-sm font-medium text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 px-3 py-2 rounded-lg transition-colors" title="Slå notifikationer til">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>
+                <div class="flex items-center gap-2 sm:gap-3">
+                    <button onclick="requestNotificationPermission()" class="border border-stroke bg-white hover:bg-neutral-100 text-ink px-3 py-1.5 text-xs font-medium uppercase tracking-wider transition-colors flex items-center gap-1.5" title="Slå notifikationer til">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-ink-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>
+                        <span class="hidden md:inline">Notifikationer</span>
                     </button>
-                    <button onclick="openPlantModal()" class="hidden sm:flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors shadow-sm">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" /></svg>
-                        Tilføj Plante
+                    <button onclick="openPlantModal()" class="bg-zinc-800 hover:bg-zinc-700 text-white border border-zinc-800 text-xs font-medium uppercase tracking-wider px-3.5 py-1.5 transition-colors flex items-center gap-1.5 shadow-sm">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" /></svg>
+                        Ny Plante
                     </button>
-                    <div class="w-px h-6 bg-gray-200 mx-1"></div>
-                    <button onclick="handleLogout()" class="text-sm font-medium text-gray-500 hover:text-red-600 hover:bg-red-50 px-3 py-2 rounded-lg transition-colors">
+                    <div class="w-px h-6 bg-stroke mx-1"></div>
+                    <button onclick="handleLogout()" class="border border-stroke bg-white hover:bg-neutral-100 text-ink-muted hover:text-ink text-xs font-medium uppercase tracking-wider px-3 py-1.5 transition-colors">
                         Log ud
                     </button>
                 </div>
             </div>
         </header>
 
-        <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <!-- Season Toggle UI -->
-            <div class="flex flex-col sm:flex-row justify-between items-center mb-8 gap-4 bg-white p-4 rounded-2xl shadow-sm border border-emerald-100">
-                <div class="text-center sm:text-left">
-                    <h2 class="text-lg font-semibold text-slate-800">Sæson-indstilling</h2>
-                    <p class="text-sm text-gray-500">Skift for at ændre vandingsbehov og slå gødning til/fra.</p>
+        <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <!-- Season Toggle UI (Dæmpet & Behageligt kantet) -->
+            <div class="bg-panel border border-stroke p-4 mb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 shadow-[2px_2px_0px_0px_rgba(24,24,27,0.04)]">
+                <div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-[11px] font-mono font-medium uppercase bg-zinc-800 text-zinc-100 px-2 py-0.5">Sæson</span>
+                        <h2 id="active-season-badge" class="text-sm font-semibold tracking-wide text-ink">Aktiv: Sommer</h2>
+                    </div>
+                    <p class="text-xs font-mono text-ink-muted mt-1.5">
+                        Sommer: 1. apr – 30. sep · Vinter: 1. okt – 31. mar
+                    </p>
                 </div>
-                <div class="inline-flex bg-emerald-100 p-1.5 rounded-full cursor-pointer shadow-inner" onclick="toggleSeason()">
-                    <div id="btn-summer" class="px-5 py-2 text-sm font-semibold rounded-full transition-all duration-300">☀️ Sommer</div>
-                    <div id="btn-winter" class="px-5 py-2 text-sm font-semibold rounded-full transition-all duration-300">❄️ Vinter</div>
+                
+                <div class="inline-flex border border-stroke p-1 bg-neutral-100 gap-1">
+                    <button id="btn-summer" onclick="setSeason('summer')" class="px-3.5 py-1.5 text-xs font-medium uppercase tracking-wider transition-colors">
+                        ☀️ Sommer (apr - sep)
+                    </button>
+                    <button id="btn-winter" onclick="setSeason('winter')" class="px-3.5 py-1.5 text-xs font-medium uppercase tracking-wider transition-colors">
+                        ❄️ Vinter (okt - mar)
+                    </button>
                 </div>
             </div>
             
-            <div id="plant-list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div id="plant-list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                 <!-- Plant cards will be injected here via JS -->
             </div>
         </main>
 
         <!-- Floating Action Button for Mobile -->
-        <button onclick="openPlantModal()" class="sm:hidden fixed bottom-6 right-6 h-14 w-14 bg-emerald-600 text-white rounded-full shadow-lg flex items-center justify-center hover:bg-emerald-700 transition-colors z-30">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
+        <button onclick="openPlantModal()" class="sm:hidden fixed bottom-6 right-6 h-12 w-12 bg-zinc-800 text-white border border-zinc-700 shadow-md flex items-center justify-center z-30" title="Tilføj plante">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
         </button>
     </div>
-
-    <!-- Modals (Add, Delete) -->
+    <!-- Modal: Add / Edit -->
     <div id="plant-modal" class="fixed inset-0 z-50 hidden">
-        <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity" onclick="closePlantModal()"></div>
+        <div class="absolute inset-0 bg-neutral-900/40 backdrop-blur-xs" onclick="closePlantModal()"></div>
         <div class="fixed inset-0 flex items-center justify-center p-4">
-            <div class="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden transform transition-all relative">
-                <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-emerald-50/50">
-                    <h3 id="modal-title" class="text-lg font-semibold text-emerald-900">Tilføj ny plante</h3>
-                    <button onclick="closePlantModal()" class="text-gray-400 hover:text-gray-600 transition-colors">
-                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+            <div class="bg-panel border border-stroke shadow-[4px_4px_0px_0px_rgba(24,24,27,0.08)] w-full max-w-md overflow-hidden relative">
+                <div class="px-5 py-3.5 border-b border-stroke flex justify-between items-center bg-neutral-50/80">
+                    <h3 id="modal-title" class="text-sm font-semibold uppercase tracking-wider text-ink">Tilføj ny plante</h3>
+                    <button onclick="closePlantModal()" class="text-ink-muted hover:text-ink p-1 border border-stroke hover:bg-neutral-100 transition-colors">
+                        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
                     </button>
                 </div>
-                <div class="p-6 space-y-4 max-h-[70vh] overflow-y-auto">
+                <div class="p-5 space-y-4 max-h-[75vh] overflow-y-auto">
                     <input type="hidden" id="p-id">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Plantens navn</label>
-                        <input type="text" id="p-name" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-emerald-500 outline-none">
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-ink-muted mb-1">Plantens navn</label>
+                        <input type="text" id="p-name" class="w-full border border-stroke px-3 py-2 text-sm bg-neutral-50/50 focus:bg-white focus:border-zinc-500 focus:outline-none transition-colors" placeholder="F.eks. Monstera Deliciosa">
                     </div>
                     
-                    <div class="grid grid-cols-2 gap-4">
+                    <div class="grid grid-cols-2 gap-3">
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Vanding Sommer (dage)</label>
-                            <input type="number" id="p-water-summer" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-emerald-500 outline-none" min="1" placeholder="April - Sept">
+                            <label class="block text-xs font-semibold uppercase tracking-wider text-ink-muted mb-1">Sommer (dage)</label>
+                            <input type="number" id="p-water-summer" class="w-full border border-stroke px-3 py-2 text-sm bg-neutral-50/50 focus:bg-white focus:border-zinc-500 focus:outline-none transition-colors" min="1" placeholder="7">
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Vanding Vinter (dage)</label>
-                            <input type="number" id="p-water-winter" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-emerald-500 outline-none" min="1" placeholder="Okt - Marts">
+                            <label class="block text-xs font-semibold uppercase tracking-wider text-ink-muted mb-1">Vinter (dage)</label>
+                            <input type="number" id="p-water-winter" class="w-full border border-stroke px-3 py-2 text-sm bg-neutral-50/50 focus:bg-white focus:border-zinc-500 focus:outline-none transition-colors" min="1" placeholder="14">
                         </div>
                     </div>
                     
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Gødning (dage)</label>
-                        <input type="number" id="p-fert" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-emerald-500 outline-none" min="1" placeholder="Valgfrit">
-                        <p class="text-xs text-gray-500 mt-1">Gødning gælder kun og vises kun i sommerperioden.</p>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-ink-muted mb-1">Gødning (hver x dag)</label>
+                        <input type="number" id="p-fert" class="w-full border border-stroke px-3 py-2 text-sm bg-neutral-50/50 focus:bg-white focus:border-zinc-500 focus:outline-none transition-colors" min="1" placeholder="F.eks. 14 (valgfrit)">
+                        <p class="text-[11px] font-mono text-ink-muted mt-1">Gødning gælder og vises kun i sommerperioden.</p>
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Kommentarer</label>
-                        <textarea id="p-notes" rows="2" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-emerald-500 outline-none resize-none"></textarea>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-ink-muted mb-1">Noter & pasningstips</label>
+                        <textarea id="p-notes" rows="3" class="w-full border border-stroke px-3 py-2 text-sm bg-neutral-50/50 focus:bg-white focus:border-zinc-500 focus:outline-none transition-colors resize-none" placeholder="Trives lyst, ingen direkte sol..."></textarea>
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Billede</label>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-ink-muted mb-1">Billede</label>
                         <div class="flex items-center justify-center w-full">
-                            <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-emerald-200 rounded-lg cursor-pointer bg-emerald-50 hover:bg-emerald-100 transition-colors">
-                                <div class="flex flex-col items-center justify-center pt-5 pb-6">
-                                    <svg class="w-8 h-8 mb-2 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
-                                    <p class="mb-2 text-sm text-gray-500"><span class="font-semibold">Klik for at uploade</span></p>
-                                </div>
+                            <label class="flex flex-col items-center justify-center w-full h-24 border border-dashed border-stroke cursor-pointer bg-neutral-50/80 hover:bg-neutral-100 transition-colors">
+                                <span class="text-xs font-mono font-medium text-ink-muted hover:text-ink underline">Vælg billedfil</span>
                                 <input id="p-image" type="file" class="hidden" accept="image/*" onchange="previewImage(event)" />
                             </label>
                         </div>
-                        <img id="image-preview" class="hidden mt-3 w-full h-32 object-cover rounded-lg border border-gray-200">
+                        <img id="image-preview" class="hidden mt-3 w-full h-32 object-cover border border-stroke">
                     </div>
                 </div>
-                <div class="px-6 py-4 border-t border-gray-100 flex justify-end gap-3 bg-gray-50">
-                    <button onclick="closePlantModal()" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">Annuller</button>
-                    <button onclick="savePlantData()" class="px-4 py-2 text-sm font-medium text-white bg-emerald-600 rounded-lg hover:bg-emerald-700 shadow-sm">Gem Plante</button>
+                <div class="px-5 py-3 border-t border-stroke flex justify-end gap-2 bg-neutral-50/80">
+                    <button onclick="closePlantModal()" class="px-4 py-1.5 text-xs font-medium uppercase tracking-wider bg-white border border-stroke text-ink hover:bg-neutral-100 transition-colors">Annuller</button>
+                    <button onclick="savePlantData()" class="px-4 py-1.5 text-xs font-medium uppercase tracking-wider text-white bg-zinc-800 border border-zinc-800 hover:bg-zinc-700 transition-colors shadow-sm">Gem Plante</button>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- Modal: Delete -->
     <div id="delete-modal" class="fixed inset-0 z-50 hidden">
-        <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onclick="closeDeleteModal()"></div>
+        <div class="absolute inset-0 bg-neutral-900/40 backdrop-blur-xs" onclick="closeDeleteModal()"></div>
         <div class="fixed inset-0 flex items-center justify-center p-4">
-            <div class="bg-white rounded-2xl shadow-xl w-full max-w-sm p-6 text-center relative">
-                <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                </div>
-                <h3 class="text-lg font-semibold text-gray-900 mb-2">Slet Plante?</h3>
-                <p class="text-sm text-gray-500 mb-6">Er du sikker på, at du vil slette denne plante? Dette kan ikke fortrydes.</p>
-                <div class="flex justify-center gap-3">
-                    <button onclick="closeDeleteModal()" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg flex-1">Annuller</button>
-                    <button id="confirm-delete-btn" onclick="confirmDelete()" class="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg flex-1">Slet</button>
+            <div class="bg-panel border border-stroke shadow-[4px_4px_0px_0px_rgba(24,24,27,0.08)] w-full max-w-sm p-6 text-center">
+                <div class="text-2xl mb-2">⚠️</div>
+                <h3 class="text-base font-semibold text-ink mb-1">Slet plante?</h3>
+                <p class="text-xs font-mono text-ink-muted mb-5">Handlingen kan ikke fortrydes. Planten fjernes permanent.</p>
+                <div class="flex gap-2">
+                    <button onclick="closeDeleteModal()" class="flex-1 py-2 text-xs font-medium uppercase tracking-wider bg-white border border-stroke text-ink hover:bg-neutral-100 transition-colors">Nej, behold</button>
+                    <button onclick="confirmDelete()" class="flex-1 py-2 text-xs font-medium uppercase tracking-wider text-white bg-red-700 border border-red-700 hover:bg-red-800 transition-colors">Ja, slet</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <div id="toast-container" class="fixed bottom-20 sm:bottom-6 left-1/2 transform -translate-x-1/2 z-50 flex flex-col gap-2 pointer-events-none"></div>
+    <div id="toast-container" class="fixed bottom-6 right-6 z-50 flex flex-col gap-2 pointer-events-none"></div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
@@ -210,14 +220,15 @@
         
         setPersistence(auth, browserLocalPersistence).catch(console.error);
 
-        const defaultSVG = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" fill="none"><rect width="400" height="300" fill="%23d1fae5"/><path d="M200 250c0-60-40-100-40-150s20-60 40-70c20 10 40 20 40 70s-40 90-40 150z" fill="%2310b981" opacity="0.8"/><path d="M200 250c0-40-20-80-20-120s10-40 20-50c10 10 20 10 20 50s-20 80-20 120z" fill="%23059669"/></svg>`;
+        // Dæmpet, rolig SVG placeholder i neutrale gråtoner
+        const defaultSVG = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 200 200" fill="none"><rect width="200" height="200" fill="%23f1f3f5"/><rect x="12" y="12" width="176" height="176" stroke="%23cbd5e1" stroke-width="1.5" stroke-dasharray="4 4"/><path d="M100 145 V65 M100 95 C82 85 68 95 68 112 C82 112 95 104 100 95 M100 112 C118 103 132 112 132 128 C118 128 105 120 100 112" stroke="%2364748b" stroke-width="2.5" stroke-linecap="square"/></svg>`;
 
         let plants = [];
         let plantToDeleteId = null;
         let activeImageBase64 = "";
         let unsubscribePlants = null;
 
-        // Season Logic: Summer is April(3) to Sept(8)
+        // Season Logic: Summer = April(3) - September(8)
         const currentMonth = new Date().getMonth();
         let currentSeason = (currentMonth >= 3 && currentMonth <= 8) ? 'summer' : 'winter';
 
@@ -255,9 +266,9 @@
             
             try {
                 await signInWithEmailAndPassword(auth, email, password);
-                showToast("Velkommen tilbage! 🪴", "success");
+                showToast("LOGGET IND", "success");
             } catch (error) {
-                showToast("Fejl: Forkert email eller adgangskode.", "error");
+                showToast("FEJL: UGYLDIG EMAIL ELLER KODE", "error");
             }
         }
 
@@ -267,12 +278,12 @@
                 document.getElementById('auth-email').value = '';
                 document.getElementById('auth-password').value = '';
             } catch (error) {
-                showToast("Fejl ved log ud", "error");
+                showToast("FEJL VED LOG UD", "error");
             }
         }
 
-        function toggleSeason() {
-            currentSeason = currentSeason === 'summer' ? 'winter' : 'summer';
+        function setSeason(season) {
+            currentSeason = season;
             updateSeasonToggleUI();
             renderPlants();
         }
@@ -280,31 +291,41 @@
         function updateSeasonToggleUI() {
             const btnSummer = document.getElementById('btn-summer');
             const btnWinter = document.getElementById('btn-winter');
+            const activeBadge = document.getElementById('active-season-badge');
             
+            if (activeBadge) {
+                activeBadge.textContent = currentSeason === 'summer' ? 'Aktiv: Sommer' : 'Aktiv: Vinter';
+            }
+
             if (currentSeason === 'summer') {
-                btnSummer.classList.add('bg-white', 'shadow', 'text-emerald-800');
-                btnSummer.classList.remove('text-emerald-600/70', 'hover:bg-emerald-200/50');
-                
-                btnWinter.classList.remove('bg-white', 'shadow', 'text-emerald-800');
-                btnWinter.classList.add('text-emerald-600/70', 'hover:bg-emerald-200/50');
+                btnSummer.className = "px-3.5 py-1.5 text-xs font-semibold uppercase tracking-wider bg-zinc-800 text-white border border-zinc-800 shadow-xs";
+                btnWinter.className = "px-3.5 py-1.5 text-xs font-medium uppercase tracking-wider text-ink-muted hover:text-ink border border-transparent";
             } else {
-                btnWinter.classList.add('bg-white', 'shadow', 'text-emerald-800');
-                btnWinter.classList.remove('text-emerald-600/70', 'hover:bg-emerald-200/50');
-                
-                btnSummer.classList.remove('bg-white', 'shadow', 'text-emerald-800');
-                btnSummer.classList.add('text-emerald-600/70', 'hover:bg-emerald-200/50');
+                btnWinter.className = "px-3.5 py-1.5 text-xs font-semibold uppercase tracking-wider bg-zinc-800 text-white border border-zinc-800 shadow-xs";
+                btnSummer.className = "px-3.5 py-1.5 text-xs font-medium uppercase tracking-wider text-ink-muted hover:text-ink border border-transparent";
             }
         }
 
         function getDaysAgo(timestamp) {
+            if (!timestamp) return 999;
             return Math.floor((Date.now() - timestamp) / 86400000);
         }
 
         function formatDaysText(days) {
             if (days === 0) return "I dag";
             if (days === 1) return "I går";
-            return `For ${days} dage siden`;
+            if (days >= 999) return "Aldrig";
+            return `${days} dage siden`;
         }
+
+        // Toggle visning af fuld tekst ved klik
+        window.togglePlantNote = function(id, event) {
+            if (event) event.stopPropagation();
+            const notePopup = document.getElementById(`note-popup-${id}`);
+            if (notePopup) {
+                notePopup.classList.toggle('hidden');
+            }
+        };
 
         function renderPlants() {
             const container = document.getElementById('plant-list');
@@ -312,9 +333,8 @@
 
             if (plants.length === 0) {
                 container.innerHTML = `
-                    <div class="col-span-full py-12 text-center text-gray-400 bg-white rounded-2xl border border-dashed border-gray-200">
-                        <svg class="mx-auto h-12 w-12 text-gray-300 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
-                        <p>Du har ingen planter endnu. Tilføj en for at komme i gang!</p>
+                    <div class="col-span-full py-16 text-center bg-panel border border-stroke shadow-[2px_2px_0px_0px_rgba(24,24,27,0.04)]">
+                        <p class="font-mono text-sm uppercase tracking-wider text-ink-muted">Ingen planter fundet. Tilføj en plante for at begynde.</p>
                     </div>
                 `;
                 return;
@@ -324,90 +344,130 @@
                 const daysSinceWater = getDaysAgo(p.lastWatered);
                 const daysSinceFert = getDaysAgo(p.lastFert);
                 
-                // Determine active watering interval based on season. Fallback to old standard 'waterInterval' if new specific ones aren't set.
-                const activeWaterInterval = currentSeason === 'summer' 
-                    ? (p.waterIntervalSummer || p.waterInterval) 
-                    : (p.waterIntervalWinter || p.waterInterval);
+                const summerDays = p.waterIntervalSummer || p.waterInterval;
+                const winterDays = p.waterIntervalWinter || p.waterInterval;
+                const activeWaterInterval = currentSeason === 'summer' ? summerDays : winterDays;
 
                 const needsWater = activeWaterInterval ? (daysSinceWater >= activeWaterInterval) : false;
-                
-                // Fertilizer is strictly summer only
                 const needsFert = (currentSeason === 'summer' && p.fertInterval) ? (daysSinceFert >= p.fertInterval) : false;
 
                 const imgSrc = p.img ? p.img : defaultSVG;
 
+                // Status badges: afdæmpede, klare uden at blænde
                 let statusHTML = '';
                 if (needsWater) {
-                    statusHTML += `<span class="bg-red-100 text-red-700 text-xs font-semibold px-2.5 py-0.5 rounded flex items-center gap-1 shadow-sm"><span class="w-1.5 h-1.5 bg-red-600 rounded-full animate-pulse"></span>Vand nu</span>`;
+                    statusHTML += `<span class="bg-amber-100/90 text-amber-900 border border-amber-300 text-[10px] font-mono font-semibold px-1.5 py-0.5 uppercase flex items-center gap-1"><span class="w-1.5 h-1.5 bg-amber-600 inline-block animate-pulse"></span>Vand nu</span>`;
                 }
                 if (needsFert) {
-                    statusHTML += `<span class="bg-amber-100 text-amber-700 text-xs font-semibold px-2.5 py-0.5 rounded flex items-center gap-1 shadow-sm"><span class="w-1.5 h-1.5 bg-amber-600 rounded-full"></span>Gødning nu</span>`;
+                    statusHTML += `<span class="bg-blue-50 text-blue-900 border border-blue-200 text-[10px] font-mono font-semibold px-1.5 py-0.5 uppercase flex items-center gap-1"><span class="w-1.5 h-1.5 bg-blue-600 inline-block"></span>Gød nu</span>`;
                 }
 
-                const fertHTML = (currentSeason === 'summer' && p.fertInterval) ? `
-                    <div class="flex items-center justify-between p-2 rounded-lg ${needsFert ? 'bg-amber-50 text-amber-700' : 'bg-blue-50 text-blue-800'}">
-                        <span class="flex items-center gap-1.5 font-medium"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg> Gødet:</span>
-                        <span>${formatDaysText(daysSinceFert)}</span>
+                const fertStatusRow = (currentSeason === 'summer' && p.fertInterval) ? `
+                    <div class="flex items-center justify-between px-2 py-1 text-xs border border-stroke/70 ${needsFert ? 'bg-amber-50/70 text-amber-900 font-semibold' : 'bg-neutral-50/60 text-ink'}">
+                        <span class="font-mono uppercase text-[11px] text-ink-muted">🧪 Gødet:</span>
+                        <span class="font-mono text-[11px] font-medium">${formatDaysText(daysSinceFert)}</span>
                     </div>
                 ` : '';
 
                 const fertButton = (currentSeason === 'summer' && p.fertInterval) ? `
-                    <button onclick="waterPlant('${p.id}', true)" class="flex items-center justify-center gap-1 bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2 px-2 rounded-lg transition-colors text-sm shadow-sm">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
+                    <button onclick="waterPlant('${p.id}', true)" class="bg-neutral-100 hover:bg-neutral-200 text-ink border border-stroke font-medium py-1.5 px-2 text-xs uppercase tracking-wider transition-colors">
                         + Gødning
                     </button>
                 ` : '';
 
-                // If fertilizer is disabled/hidden, make water button take full width.
                 const buttonsGridClass = (currentSeason === 'summer' && p.fertInterval) ? 'grid-cols-2' : 'grid-cols-1';
 
                 container.innerHTML += `
-                    <div class="bg-white rounded-2xl shadow-sm hover:shadow-md border border-emerald-100 overflow-hidden transition-all duration-300 flex flex-col group">
-                        <div class="relative h-48 w-full bg-emerald-50 overflow-hidden">
-                            <img src="${imgSrc}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" alt="${p.name}">
-                            <div class="absolute top-3 right-3 flex flex-col items-end gap-2">
-                                ${statusHTML}
+                    <div class="bg-panel border border-stroke p-3.5 shadow-[2px_2px_0px_0px_rgba(24,24,27,0.04)] flex flex-col justify-between relative hover:border-zinc-400 transition-colors">
+                        <div>
+                            <!-- Header med kvadratisk billede & detaljer -->
+                            <div class="flex items-start gap-3 mb-3">
+                                <div class="w-20 h-20 flex-shrink-0 bg-neutral-100 border border-stroke overflow-hidden relative">
+                                    <img src="${imgSrc}" class="w-full h-full object-cover" alt="${p.name}">
+                                </div>
+
+                                <div class="flex-1 min-w-0">
+                                    <div class="flex items-start justify-between gap-1">
+                                        <h3 class="text-sm font-semibold tracking-tight truncate text-ink" title="${p.name}">
+                                            ${p.name}
+                                        </h3>
+                                        <div class="flex items-center gap-1 flex-shrink-0">
+                                            <button onclick="openPlantModal('${p.id}')" class="border border-stroke p-1 text-ink-muted hover:text-ink hover:bg-neutral-100 transition-colors" title="Rediger">
+                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                                            </button>
+                                            <button onclick="openDeleteModal('${p.id}')" class="border border-stroke p-1 text-ink-muted hover:text-red-700 hover:bg-neutral-100 transition-colors" title="Slet">
+                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <!-- Status indikatorer -->
+                                    <div class="flex flex-wrap items-center gap-1 mt-1.5">
+                                        ${statusHTML}
+                                        <span class="text-[10px] font-mono font-medium border border-stroke bg-neutral-50 px-1.5 py-0.5 text-ink-muted">
+                                            Hver ${activeWaterInterval || '-'}d
+                                        </span>
+                                    </div>
+
+                                    <!-- Sæson info med rolig kontrast -->
+                                    <div class="text-[10px] font-mono text-ink-muted mt-1.5 flex items-center gap-1.5">
+                                        <span class="${currentSeason === 'summer' ? 'font-semibold text-ink underline decoration-zinc-400 underline-offset-2' : ''}">S:${summerDays || '-'}d</span>
+                                        <span class="text-zinc-300">/</span>
+                                        <span class="${currentSeason === 'winter' ? 'font-semibold text-ink underline decoration-zinc-400 underline-offset-2' : ''}">V:${winterDays || '-'}d</span>
+                                        ${p.fertInterval ? `<span class="text-zinc-300">/</span><span class="${currentSeason === 'summer' ? 'font-semibold text-ink underline decoration-zinc-400 underline-offset-2' : ''}">G:${p.fertInterval}d</span>` : ''}
+                                    </div>
+                                </div>
                             </div>
-                            <div class="absolute top-3 left-3 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                                <button onclick="openPlantModal('${p.id}')" class="bg-white/90 backdrop-blur text-gray-700 p-1.5 rounded-lg shadow hover:text-emerald-600 transition-colors">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
-                                </button>
-                                <button onclick="openDeleteModal('${p.id}')" class="bg-white/90 backdrop-blur text-gray-700 p-1.5 rounded-lg shadow hover:text-red-600 transition-colors">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="p-5 flex flex-col flex-grow">
-                            <h3 class="text-xl font-bold text-slate-800 mb-3">${p.name}</h3>
-                            
+
+                            <!-- INTERAKTIV NOTE-SEKTION (HOVER OG KLIK) -->
                             ${p.notes ? `
-                            <div class="mb-4 text-sm text-gray-600 bg-emerald-50/50 p-3 rounded-lg border border-emerald-100/50 italic flex gap-2 items-start">
-                                <svg class="w-4 h-4 text-emerald-500 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                <p class="leading-relaxed">${p.notes}</p>
+                            <div class="relative mb-3 group/info">
+                                <div onclick="togglePlantNote('${p.id}', event)" class="cursor-pointer border border-stroke bg-neutral-50/70 hover:bg-neutral-100 px-2 py-1.5 flex items-center justify-between text-xs transition-colors select-none" title="Klik for at folde ud/ind">
+                                    <div class="flex items-center gap-1.5 min-w-0 pr-1">
+                                        <span class="inline-flex items-center justify-center w-4 h-4 bg-zinc-700 text-white font-mono text-[10px] font-medium flex-shrink-0">i</span>
+                                        <span class="truncate font-mono text-[11px] text-ink-muted">${p.notes}</span>
+                                    </div>
+                                    <span class="text-[9px] font-mono uppercase text-ink-muted hover:text-ink flex-shrink-0 underline">Læs</span>
+                                </div>
+
+                                <!-- HOVER TOOLTIP (Behagelig mørkegrå baggrund med blød skygge) -->
+                                <div class="hidden group-hover/info:block pointer-events-none absolute left-0 right-0 bottom-full mb-1.5 z-40 bg-zinc-800 text-zinc-100 p-2.5 text-xs font-mono border border-zinc-700 shadow-md">
+                                    <div class="text-[10px] uppercase font-medium text-zinc-400 mb-1 border-b border-zinc-700 pb-0.5">Note</div>
+                                    <p class="leading-relaxed whitespace-pre-wrap">${p.notes}</p>
+                                </div>
+
+                                <!-- KLIK-UDVIDET MODUS -->
+                                <div id="note-popup-${p.id}" class="hidden mt-1.5 bg-panel border border-stroke p-2.5 text-xs font-mono shadow-[2px_2px_0px_0px_rgba(24,24,27,0.04)]">
+                                    <div class="flex items-center justify-between border-b border-stroke pb-1 mb-1.5">
+                                        <span class="font-semibold uppercase text-[10px] text-ink">Note detaljer</span>
+                                        <button onclick="togglePlantNote('${p.id}', event)" class="text-[10px] text-ink-muted hover:text-ink uppercase underline">Luk [X]</button>
+                                    </div>
+                                    <p class="text-ink leading-relaxed whitespace-pre-wrap">${p.notes}</p>
+                                </div>
                             </div>
                             ` : ''}
-                            
-                            <div class="space-y-2 mb-6 flex-grow text-sm">
-                                <div class="flex items-center justify-between p-2 rounded-lg ${needsWater ? 'bg-red-50 text-red-700' : 'bg-emerald-50 text-emerald-800'}">
-                                    <span class="flex items-center gap-1.5 font-medium"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"></path></svg> Vandet:</span>
-                                    <span>${formatDaysText(daysSinceWater)}</span>
+
+                            <!-- Sidst vandet status -->
+                            <div class="space-y-1 mb-3">
+                                <div class="flex items-center justify-between px-2 py-1 text-xs border border-stroke/70 ${needsWater ? 'bg-amber-50/80 text-amber-950 font-semibold' : 'bg-neutral-50/50 text-ink'}">
+                                    <span class="font-mono uppercase text-[11px] text-ink-muted">💧 Vandet:</span>
+                                    <span class="font-mono text-[11px] font-medium">${formatDaysText(daysSinceWater)}</span>
                                 </div>
-                                ${fertHTML}
+                                ${fertStatusRow}
                             </div>
-                            
-                            <div class="grid ${buttonsGridClass} gap-2 mt-auto">
-                                <button onclick="waterPlant('${p.id}', false)" class="flex items-center justify-center gap-1 bg-emerald-100 hover:bg-emerald-200 text-emerald-800 font-medium py-2 px-2 rounded-lg transition-colors text-sm shadow-sm">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"></path></svg>
-                                    Vand
-                                </button>
-                                ${fertButton}
-                            </div>
+                        </div>
+
+                        <!-- Handlingsknapper -->
+                        <div class="grid ${buttonsGridClass} gap-1.5 pt-1">
+                            <button onclick="waterPlant('${p.id}', false)" class="bg-zinc-800 hover:bg-zinc-700 text-white border border-zinc-800 font-medium py-1.5 px-3 text-xs uppercase tracking-wider transition-colors shadow-xs">
+                                Vand
+                            </button>
+                            ${fertButton}
                         </div>
                     </div>
                 `;
             });
         }
-
         async function waterPlant(id, withFertilizer) {
             const plant = plants.find(p => p.id === id);
             if (!plant) return;
@@ -420,7 +480,7 @@
                 }
                 
                 await updateDoc(plantRef, updates);
-                showToast(`${plant.name} er blevet passet! 🪴`, "success");
+                showToast(`${plant.name} opdateret`, "success");
             } catch (error) {
                 showToast("Fejl ved opdatering", "error");
             }
@@ -429,15 +489,15 @@
         function showToast(message, type = "info") {
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
-            const bgColor = type === 'success' ? 'bg-emerald-600' : (type === 'error' ? 'bg-red-600' : 'bg-gray-800');
-            toast.className = `${bgColor} text-white px-4 py-3 rounded-lg shadow-lg flex items-center gap-2 transform transition-all duration-300 translate-y-4 opacity-0 pointer-events-auto`;
-            toast.innerHTML = `<span class="font-medium text-sm">${message}</span>`;
+            const bgClass = type === 'error' ? 'bg-red-800 text-white border-red-700' : 'bg-zinc-800 text-zinc-100 border-zinc-700';
+            toast.className = `${bgClass} border px-3.5 py-2 shadow-md text-xs font-mono uppercase tracking-wider transform transition-all duration-200 translate-y-2 opacity-0 pointer-events-auto`;
+            toast.innerHTML = message;
             
             container.appendChild(toast);
-            setTimeout(() => toast.classList.remove('translate-y-4', 'opacity-0'), 10);
+            setTimeout(() => toast.classList.remove('translate-y-2', 'opacity-0'), 10);
             setTimeout(() => {
-                toast.classList.add('opacity-0', 'scale-95');
-                setTimeout(() => toast.remove(), 300);
+                toast.classList.add('opacity-0');
+                setTimeout(() => toast.remove(), 250);
             }, 3000);
         }
 
@@ -459,7 +519,6 @@
                     document.getElementById('p-id').value = plant.id;
                     document.getElementById('p-name').value = plant.name;
                     
-                    // Use new fields, fallback to old single field if not present
                     document.getElementById('p-water-summer').value = plant.waterIntervalSummer || plant.waterInterval || '';
                     document.getElementById('p-water-winter').value = plant.waterIntervalWinter || plant.waterInterval || '';
                     
@@ -492,8 +551,8 @@
                 img.onload = function() {
                     const canvas = document.createElement('canvas');
                     const ctx = canvas.getContext('2d');
-                    const MAX_WIDTH = 500;
-                    const MAX_HEIGHT = 500;
+                    const MAX_WIDTH = 400;
+                    const MAX_HEIGHT = 400;
                     let width = img.width;
                     let height = img.height;
 
@@ -523,7 +582,7 @@
         }
 
         async function savePlantData() {
-            if(!auth.currentUser) return showToast("Du skal være logget ind!", "error");
+            if(!auth.currentUser) return showToast("DU SKAL VÆRE LOGGET IND", "error");
 
             const id = document.getElementById('p-id').value;
             const name = document.getElementById('p-name').value.trim();
@@ -532,24 +591,27 @@
             const fert = document.getElementById('p-fert').value ? parseInt(document.getElementById('p-fert').value) : null;
             const notes = document.getElementById('p-notes').value.trim();
 
-            if(!name || !waterSummer || !waterWinter) {
-                showToast("Udfyld venligst navn og begge vandings-intervaller!", "error");
+            if(!name || isNaN(waterSummer) || isNaN(waterWinter)) {
+                showToast("UDFYLD NAVN OG BEGGE VANDINGS-DAGE", "error");
                 return;
             }
 
             try {
                 if (id) {
                     const plantRef = doc(db, 'plants', id);
-                    await updateDoc(plantRef, {
+                    const updatePayload = {
                         name: name,
                         waterIntervalSummer: waterSummer,
                         waterIntervalWinter: waterWinter,
-                        waterInterval: waterSummer, // Keeping legacy field updated for safety
+                        waterInterval: waterSummer,
                         fertInterval: fert,
-                        notes: notes,
-                        img: activeImageBase64
-                    });
-                    showToast(`${name} blev opdateret!`, "success");
+                        notes: notes
+                    };
+                    if (activeImageBase64) {
+                        updatePayload.img = activeImageBase64;
+                    }
+                    await updateDoc(plantRef, updatePayload);
+                    showToast("PLANTE OPDATERET", "success");
                 } else {
                     await addDoc(collection(db, 'plants'), {
                         name: name,
@@ -562,12 +624,12 @@
                         lastFert: Date.now(),
                         img: activeImageBase64
                     });
-                    showToast(`${name} blev tilføjet!`, "success");
+                    showToast("PLANTE TILFØJET", "success");
                 }
                 closePlantModal();
             } catch (error) {
                 console.error(error);
-                showToast("Fejl ved gemning. Tjek dine rettigheder.", "error");
+                showToast("FEJL VED GEMNING", "error");
             }
         }
 
@@ -583,13 +645,12 @@
 
         async function confirmDelete() {
             if (plantToDeleteId) {
-                const plantName = plants.find(p => p.id === plantToDeleteId)?.name || "Planten";
                 try {
                     await deleteDoc(doc(db, 'plants', plantToDeleteId));
                     closeDeleteModal();
-                    showToast(`${plantName} blev slettet.`, "info");
+                    showToast("PLANTE SLETTET", "info");
                 } catch (error) {
-                    showToast("Fejl ved sletning", "error");
+                    showToast("FEJL VED SLETNING", "error");
                 }
             }
         }
@@ -597,8 +658,8 @@
         function requestNotificationPermission() {
             if ("Notification" in window) {
                 Notification.requestPermission().then(permission => {
-                    if(permission === "granted") showToast("Notifikationer er aktiveret!", "success");
-                    else showToast("Notifikationer blev afvist.", "error");
+                    if(permission === "granted") showToast("NOTIFIKATIONER SLÅET TIL", "success");
+                    else showToast("NOTIFIKATIONER BLEV AFVIST", "error");
                 });
             }
         }
@@ -618,17 +679,17 @@
             });
 
             if (alerts.length > 0) {
-                new Notification("🌱 Plante Vagt", {
-                    body: `Vandings-tid! Disse planter er tørstige: ${alerts.join(', ')}`,
+                new Notification("Plante Vagt", {
+                    body: `Vandingstid: ${alerts.join(', ')}`,
                     icon: "data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌱</text></svg>"
                 });
             }
         }
 
-        // Attach to window so HTML event handlers can use them
+        // Gør funktioner tilgængelige for HTML onclick
         window.handleLogin = handleLogin;
         window.handleLogout = handleLogout;
-        window.toggleSeason = toggleSeason;
+        window.setSeason = setSeason;
         window.requestNotificationPermission = requestNotificationPermission;
         window.openPlantModal = openPlantModal;
         window.closePlantModal = closePlantModal;
@@ -638,7 +699,6 @@
         window.closeDeleteModal = closeDeleteModal;
         window.confirmDelete = confirmDelete;
         window.waterPlant = waterPlant;
-
     </script>
 </body>
 </html>
