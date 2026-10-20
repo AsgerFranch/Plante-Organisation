@@ -81,7 +81,13 @@
                     <h1 class="text-base sm:text-xl font-bold tracking-tight text-ink truncate">Plante Vagt</h1>
                     <span class="hidden md:inline-block text-[11px] font-mono border border-stroke px-2 py-0.5 bg-neutral-50 text-ink-muted uppercase">Log & Arkiv</span>
                 </div>
-                <div class="flex items-center gap-1.5 sm:gap-2.5">
+                <div class="flex items-center gap-1.5 sm:gap-2">
+                    <!-- DEFINITIONER / GUIDE KNAP -->
+                    <button onclick="openDefinitionsModal()" class="bg-neutral-100 hover:bg-neutral-200 active:bg-neutral-300 text-ink text-xs font-mono font-medium uppercase tracking-wider px-2.5 sm:px-3 py-2 sm:py-1.5 transition-colors flex items-center gap-1.5 border border-stroke" title="Kategorier & Definitioner">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-zinc-700" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="square" stroke-linejoin="miter" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
+                        <span>Guide</span>
+                    </button>
+
                     <!-- IMPORTER KNAP -->
                     <label class="bg-white hover:bg-neutral-100 active:bg-neutral-200 text-ink text-xs font-medium uppercase tracking-wider px-2.5 sm:px-3 py-2 sm:py-1.5 transition-colors flex items-center gap-1.5 cursor-pointer border border-stroke" title="Importer JSON backup">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-ink-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg>
@@ -156,39 +162,127 @@
     <div id="plant-modal" class="fixed inset-0 z-50 hidden">
         <div class="absolute inset-0 bg-neutral-900/50 backdrop-blur-xs" onclick="closePlantModal()"></div>
         <div class="fixed inset-0 flex items-end sm:items-center justify-center sm:p-4 pointer-events-none">
-            <div class="bg-panel border-t sm:border border-stroke shadow-[0_-4px_12px_rgba(0,0,0,0.08)] sm:shadow-[4px_4px_0px_0px_rgba(24,24,27,0.08)] w-full max-w-md overflow-hidden relative pointer-events-auto max-h-[90vh] flex flex-col">
+            <div class="bg-panel border-t sm:border border-stroke shadow-[0_-4px_12px_rgba(0,0,0,0.08)] sm:shadow-[4px_4px_0px_0px_rgba(24,24,27,0.08)] w-full max-w-lg overflow-hidden relative pointer-events-auto max-h-[92vh] flex flex-col">
                 <div class="px-5 py-3.5 border-b border-stroke flex justify-between items-center bg-neutral-50/80 flex-shrink-0">
                     <h3 id="modal-title" class="text-sm font-semibold uppercase tracking-wider text-ink">Tilføj ny plante</h3>
                     <button onclick="closePlantModal()" class="text-ink-muted hover:text-ink p-1.5 border border-stroke bg-white hover:bg-neutral-100 transition-colors">
                         <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
                     </button>
                 </div>
-                <div class="p-5 space-y-4 overflow-y-auto flex-1">
+                <div class="p-5 space-y-5 overflow-y-auto flex-1">
                     <input type="hidden" id="p-id">
                     <div>
                         <label class="block text-xs font-semibold uppercase tracking-wider text-ink-muted mb-1">Plantens navn *</label>
                         <input type="text" id="p-name" class="w-full border border-stroke px-3 py-2.5 text-base sm:text-sm bg-neutral-50/50 focus:bg-white focus:border-zinc-500 focus:outline-none transition-colors" placeholder="F.eks. Monstera Deliciosa">
                     </div>
 
-                    <div class="bg-neutral-50 border border-stroke p-3 text-xs font-mono text-ink-muted">
-                        💡 Vandingsfrekvens beregnes automatisk som et gennemsnit for sommer og vinter ud fra din vandingshistorik.
+                    <!-- 1. SOLLYS PRÆFERENCE -->
+                    <div>
+                        <div class="flex items-center justify-between mb-1.5">
+                            <label class="block text-xs font-semibold uppercase tracking-wider text-ink-muted">1. Sollys præference</label>
+                            <button type="button" onclick="openDefinitionsModal()" class="text-[10px] font-mono uppercase underline text-ink-muted hover:text-ink">Se guide</button>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <button type="button" id="sun-btn-direct" onclick="selectSunlight('direct')" class="border border-stroke bg-neutral-50/60 hover:bg-neutral-100 py-2.5 px-3 flex items-center justify-center gap-2 text-xs font-mono uppercase transition-colors">
+                                <svg class="w-4 h-4 text-amber-600 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="4"></circle>
+                                    <path stroke-linecap="square" d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41m11.32-11.32l1.41-1.41"></path>
+                                </svg>
+                                <span>Direkte sol</span>
+                            </button>
+                            <button type="button" id="sun-btn-indirect" onclick="selectSunlight('indirect')" class="border border-stroke bg-neutral-50/60 hover:bg-neutral-100 py-2.5 px-3 flex items-center justify-center gap-2 text-xs font-mono uppercase transition-colors">
+                                <svg class="w-4 h-4 text-zinc-600 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="square" d="M3 3l18 18M10.5 6.5A5.5 5.5 0 0117.5 13.5M6.7 6.7a5.5 5.5 0 007.6 7.6M12 2v2m8 8h2M4 12H2m10 8v2"></path>
+                                </svg>
+                                <span>Ej direkte sol</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 2. JORDFUGTIGHED INDEN VANDING -->
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-ink-muted mb-1.5">2. Jordens tilstand ved vanding</label>
+                        <div class="grid grid-cols-2 gap-2">
+                            <button type="button" id="soil-btn-bone_dry" onclick="selectSoilTrigger('bone_dry')" class="border border-stroke bg-neutral-50/60 hover:bg-neutral-100 p-2.5 text-left transition-colors">
+                                <div class="flex items-center justify-between mb-1">
+                                    <span class="font-mono text-xs font-semibold uppercase">Knastør</span>
+                                    <span class="flex gap-0.5"><span class="w-2 h-2 bg-amber-600"></span><span class="w-2 h-2 bg-zinc-200"></span><span class="w-2 h-2 bg-zinc-200"></span><span class="w-2 h-2 bg-zinc-200"></span></span>
+                                </div>
+                                <span class="block text-[10px] font-mono text-ink-muted">Tør helt til bunden</span>
+                            </button>
+                            <button type="button" id="soil-btn-dry_top" onclick="selectSoilTrigger('dry_top')" class="border border-stroke bg-neutral-50/60 hover:bg-neutral-100 p-2.5 text-left transition-colors">
+                                <div class="flex items-center justify-between mb-1">
+                                    <span class="font-mono text-xs font-semibold uppercase">Tør top</span>
+                                    <span class="flex gap-0.5"><span class="w-2 h-2 bg-emerald-600"></span><span class="w-2 h-2 bg-emerald-600"></span><span class="w-2 h-2 bg-zinc-200"></span><span class="w-2 h-2 bg-zinc-200"></span></span>
+                                </div>
+                                <span class="block text-[10px] font-mono text-ink-muted">Tør i øverste 2-4 cm</span>
+                            </button>
+                            <button type="button" id="soil-btn-slightly_moist" onclick="selectSoilTrigger('slightly_moist')" class="border border-stroke bg-neutral-50/60 hover:bg-neutral-100 p-2.5 text-left transition-colors">
+                                <div class="flex items-center justify-between mb-1">
+                                    <span class="font-mono text-xs font-semibold uppercase">Let fugtig</span>
+                                    <span class="flex gap-0.5"><span class="w-2 h-2 bg-sky-600"></span><span class="w-2 h-2 bg-sky-600"></span><span class="w-2 h-2 bg-sky-600"></span><span class="w-2 h-2 bg-zinc-200"></span></span>
+                                </div>
+                                <span class="block text-[10px] font-mono text-ink-muted">Aldrig helt udtørret</span>
+                            </button>
+                            <button type="button" id="soil-btn-moist" onclick="selectSoilTrigger('moist')" class="border border-stroke bg-neutral-50/60 hover:bg-neutral-100 p-2.5 text-left transition-colors">
+                                <div class="flex items-center justify-between mb-1">
+                                    <span class="font-mono text-xs font-semibold uppercase">Fugtig</span>
+                                    <span class="flex gap-0.5"><span class="w-2 h-2 bg-blue-700"></span><span class="w-2 h-2 bg-blue-700"></span><span class="w-2 h-2 bg-blue-700"></span><span class="w-2 h-2 bg-blue-700"></span></span>
+                                </div>
+                                <span class="block text-[10px] font-mono text-ink-muted">Konstant jævnt fugtig</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 3. VANDINGSMÆNGDE / METODE -->
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-ink-muted mb-1.5">3. Vandingsmetode & Mængde</label>
+                        <div class="grid grid-cols-2 gap-2">
+                            <button type="button" id="amt-btn-bottom" onclick="selectWaterAmount('bottom')" class="border border-stroke bg-neutral-50/60 hover:bg-neutral-100 p-2.5 text-left transition-colors">
+                                <div class="flex items-center justify-between mb-1">
+                                    <span class="font-mono text-xs font-semibold uppercase">Bundvanding</span>
+                                    <span class="text-xs">📥</span>
+                                </div>
+                                <span class="block text-[10px] font-mono text-ink-muted">Trækker selv nedefra</span>
+                            </button>
+                            <button type="button" id="amt-btn-soak" onclick="selectWaterAmount('soak')" class="border border-stroke bg-neutral-50/60 hover:bg-neutral-100 p-2.5 text-left transition-colors">
+                                <div class="flex items-center justify-between mb-1">
+                                    <span class="font-mono text-xs font-semibold uppercase">Gennemvand</span>
+                                    <span class="text-xs">🌊</span>
+                                </div>
+                                <span class="block text-[10px] font-mono text-ink-muted">Rigeligt til dræn</span>
+                            </button>
+                            <button type="button" id="amt-btn-moderate" onclick="selectWaterAmount('moderate')" class="border border-stroke bg-neutral-50/60 hover:bg-neutral-100 p-2.5 text-left transition-colors">
+                                <div class="flex items-center justify-between mb-1">
+                                    <span class="font-mono text-xs font-semibold uppercase">Moderat</span>
+                                    <span class="text-xs">💧</span>
+                                </div>
+                                <span class="block text-[10px] font-mono text-ink-muted">Jævn mængde oppefra</span>
+                            </button>
+                            <button type="button" id="amt-btn-light" onclick="selectWaterAmount('light')" class="border border-stroke bg-neutral-50/60 hover:bg-neutral-100 p-2.5 text-left transition-colors">
+                                <div class="flex items-center justify-between mb-1">
+                                    <span class="font-mono text-xs font-semibold uppercase">Sparsom</span>
+                                    <span class="text-xs">🤏</span>
+                                </div>
+                                <span class="block text-[10px] font-mono text-ink-muted">Lille sjat / let fugt</span>
+                            </button>
+                        </div>
                     </div>
                     
                     <div>
                         <label class="block text-xs font-semibold uppercase tracking-wider text-ink-muted mb-1">Gødning om sommeren (valgfrit)</label>
                         <input type="number" id="p-fert" class="w-full border border-stroke px-3 py-2.5 text-base sm:text-sm bg-neutral-50/50 focus:bg-white focus:border-zinc-500 focus:outline-none transition-colors" min="1" placeholder="Antal dage imellem, f.eks. 14">
-                        <p class="text-[11px] font-mono text-ink-muted mt-1">Udfyld hvis du vil have gødningsknap vist i sommerperioden.</p>
                     </div>
 
                     <div>
-                        <label class="block text-xs font-semibold uppercase tracking-wider text-ink-muted mb-1">Noter & pasningstips</label>
-                        <textarea id="p-notes" rows="3" class="w-full border border-stroke px-3 py-2.5 text-base sm:text-sm bg-neutral-50/50 focus:bg-white focus:border-zinc-500 focus:outline-none transition-colors resize-none" placeholder="Trives lyst, bundvandes..."></textarea>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-ink-muted mb-1">Skjult pasningsnote (valgfrit)</label>
+                        <textarea id="p-notes" rows="2" class="w-full border border-stroke px-3 py-2 text-base sm:text-sm bg-neutral-50/50 focus:bg-white focus:border-zinc-500 focus:outline-none transition-colors resize-none" placeholder="Vises kun ved klik på note-ikonet..."></textarea>
                     </div>
 
                     <div>
                         <label class="block text-xs font-semibold uppercase tracking-wider text-ink-muted mb-1">Billede</label>
                         <div class="flex items-center justify-center w-full">
-                            <label class="flex flex-col items-center justify-center w-full h-24 border border-dashed border-stroke cursor-pointer bg-neutral-50/80 hover:bg-neutral-100 active:bg-neutral-200 transition-colors">
+                            <label class="flex flex-col items-center justify-center w-full h-20 border border-dashed border-stroke cursor-pointer bg-neutral-50/80 hover:bg-neutral-100 active:bg-neutral-200 transition-colors">
                                 <span class="text-xs font-mono font-medium text-ink-muted hover:text-ink underline">Vælg eller tag billede</span>
                                 <input id="p-image" type="file" class="hidden" accept="image/*" onchange="previewImage(event)" />
                             </label>
@@ -204,12 +298,73 @@
         </div>
     </div>
 
+    <!-- MODAL: KATEGORIER & DEFINITIONER (REDIGERBAR) -->
+    <div id="definitions-modal" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-neutral-900/50 backdrop-blur-xs" onclick="closeDefinitionsModal()"></div>
+        <div class="fixed inset-0 flex items-end sm:items-center justify-center sm:p-4 pointer-events-none">
+            <div class="bg-panel border-t sm:border border-stroke shadow-[0_-4px_12px_rgba(0,0,0,0.08)] sm:shadow-[4px_4px_0px_0px_rgba(24,24,27,0.08)] w-full max-w-2xl overflow-hidden relative pointer-events-auto max-h-[90vh] flex flex-col">
+                <div class="px-5 py-3.5 border-b border-stroke flex justify-between items-center bg-neutral-50/80 flex-shrink-0">
+                    <div>
+                        <span class="text-[10px] font-mono uppercase tracking-wider text-ink-muted block">Opslagsværk</span>
+                        <h3 class="text-sm font-bold uppercase tracking-wider text-ink">Pasningskategorier & Definitioner</h3>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button id="toggle-edit-defs-btn" onclick="toggleDefinitionsEditMode()" class="px-3 py-1.5 text-xs font-mono uppercase border border-stroke bg-white hover:bg-neutral-100 text-ink transition-colors">
+                            ✎ Rediger tekster
+                        </button>
+                        <button onclick="closeDefinitionsModal()" class="text-ink-muted hover:text-ink p-1.5 border border-stroke bg-white hover:bg-neutral-100 transition-colors">
+                            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                        </button>
+                    </div>
+                </div>
+
+                <div id="definitions-content" class="p-5 overflow-y-auto space-y-6 flex-1">
+                </div>
+
+                <div class="px-5 py-3 border-t border-stroke flex justify-between items-center bg-neutral-50/80 flex-shrink-0">
+                    <span class="text-[11px] font-mono text-ink-muted">Synkroniseres på tværs af dine enheder</span>
+                    <div class="flex gap-2">
+                        <button id="save-defs-btn" onclick="saveDefinitions()" class="hidden px-4 py-2 sm:py-1.5 text-xs font-medium uppercase tracking-wider bg-emerald-700 text-white hover:bg-emerald-800 transition-colors">
+                            Gem ændringer
+                        </button>
+                        <button onclick="closeDefinitionsModal()" class="px-4 py-2 sm:py-1.5 text-xs font-medium uppercase tracking-wider bg-zinc-800 text-white hover:bg-zinc-700 transition-colors">
+                            Luk
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: DISKRET NOTE VISNING -->
+    <div id="note-modal" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-neutral-900/50 backdrop-blur-xs" onclick="closeNoteModal()"></div>
+        <div class="fixed inset-0 flex items-center justify-center p-4 pointer-events-none">
+            <div class="bg-panel border border-stroke shadow-[4px_4px_0px_0px_rgba(24,24,27,0.08)] w-full max-w-sm overflow-hidden relative pointer-events-auto">
+                <div class="px-4 py-3 border-b border-stroke flex justify-between items-center bg-neutral-50">
+                    <div>
+                        <span class="text-[10px] font-mono uppercase text-ink-muted block">Pasningsnote</span>
+                        <h3 id="note-modal-title" class="text-sm font-bold text-ink truncate">Plante</h3>
+                    </div>
+                    <button onclick="closeNoteModal()" class="text-ink-muted hover:text-ink p-1 border border-stroke bg-white">
+                        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                    </button>
+                </div>
+                <div class="p-4">
+                    <p id="note-modal-body" class="text-xs font-mono text-ink leading-relaxed whitespace-pre-wrap"></p>
+                </div>
+                <div class="px-4 py-2.5 border-t border-stroke bg-neutral-50 flex justify-end">
+                    <button onclick="closeNoteModal()" class="px-4 py-1.5 text-xs font-mono uppercase bg-zinc-800 text-white">Luk</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- MODAL: VANDINGSHISTORIK -->
     <div id="history-modal" class="fixed inset-0 z-50 hidden">
         <div class="absolute inset-0 bg-neutral-900/50 backdrop-blur-xs" onclick="closeHistoryModal()"></div>
         <div class="fixed inset-0 flex items-end sm:items-center justify-center sm:p-4 pointer-events-none">
             <div class="bg-panel border-t sm:border border-stroke shadow-[0_-4px_12px_rgba(0,0,0,0.08)] sm:shadow-[4px_4px_0px_0px_rgba(24,24,27,0.08)] w-full max-w-lg overflow-hidden relative pointer-events-auto max-h-[90vh] flex flex-col">
-                <!-- Header -->
                 <div class="px-5 py-3.5 border-b border-stroke flex justify-between items-center bg-neutral-50/80 flex-shrink-0">
                     <div class="min-w-0 pr-2">
                         <span class="text-[10px] font-mono uppercase tracking-wider text-ink-muted block">Vandingshistorik</span>
@@ -220,7 +375,6 @@
                     </button>
                 </div>
 
-                <!-- Gennemsnit Statistik Bar -->
                 <div class="grid grid-cols-3 border-b border-stroke bg-neutral-50/40 divide-x divide-stroke flex-shrink-0 text-center">
                     <div class="p-2.5">
                         <span class="block text-[10px] font-mono uppercase text-ink-muted">☀️ Gns. Sommer</span>
@@ -236,7 +390,6 @@
                     </div>
                 </div>
 
-                <!-- Tilføj manuel dato -->
                 <div class="px-4 py-3 bg-neutral-100/70 border-b border-stroke flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 flex-shrink-0">
                     <label for="manual-water-date" class="text-[11px] font-mono uppercase text-ink-muted">Efterregistrer vanding:</label>
                     <div class="flex items-center gap-1.5">
@@ -247,11 +400,9 @@
                     </div>
                 </div>
 
-                <!-- Historik Liste -->
                 <div id="history-list" class="p-4 overflow-y-auto divide-y divide-stroke/60 flex-1 max-h-[50vh]">
                 </div>
 
-                <!-- Footer -->
                 <div class="px-5 py-3 border-t border-stroke flex justify-end bg-neutral-50/80 flex-shrink-0">
                     <button onclick="closeHistoryModal()" class="w-full sm:w-auto px-5 py-2.5 sm:py-1.5 text-xs font-medium uppercase tracking-wider bg-zinc-800 text-white hover:bg-zinc-700 transition-colors">
                         Luk vindue
@@ -304,11 +455,83 @@
 
         const defaultSVG = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 200 200" fill="none"><rect width="200" height="200" fill="%23f1f3f5"/><rect x="12" y="12" width="176" height="176" stroke="%23cbd5e1" stroke-width="1.5" stroke-dasharray="4 4"/><path d="M100 145 V65 M100 95 C82 85 68 95 68 112 C82 112 95 104 100 95 M100 112 C118 103 132 112 132 128 C118 128 105 120 100 112" stroke="%2364748b" stroke-width="2.5" stroke-linecap="square"/></svg>`;
 
+        const DEFAULT_DEFINITIONS = {
+            sun_direct: {
+                group: "1. Sollys",
+                title: "Direkte sol",
+                badge: "☀️ Direkte sol",
+                desc: "Trives i vindueskarme (syd/vest) med mange timers direkte solstråler."
+            },
+            sun_indirect: {
+                group: "1. Sollys",
+                title: "Ej direkte sol (Indirekte)",
+                badge: "🌥️ Indirekte lys",
+                desc: "Trives lyst i rummet eller ved øst/nord-vindue, men bladene kan svi ved skarp direkte middagssol."
+            },
+            soil_bone_dry: {
+                group: "2. Jord ved vanding",
+                title: "Knastør",
+                badge: "▪▫▫▫ Knastør",
+                desc: "Hele potten skal tørre helt ud fra top til bund, og potten skal føles markant let, før der vandes."
+            },
+            soil_dry_top: {
+                group: "2. Jord ved vanding",
+                title: "Tør top",
+                badge: "▪▪▫▫ Tør top",
+                desc: "Vandes når de øverste 2–4 cm af jorden føles tørre (stik en finger ned til første kno)."
+            },
+            soil_slightly_moist: {
+                group: "2. Jord ved vanding",
+                title: "Let fugtig",
+                badge: "▪▪▪▫ Let fugtig",
+                desc: "Jorden må kun lige tørre på selve overfladen; dybere nede skal den altid føles kølig og let fugtig."
+            },
+            soil_moist: {
+                group: "2. Jord ved vanding",
+                title: "Fugtig",
+                badge: "▪▪▪▪ Fugtig",
+                desc: "Jorden skal holdes jævnt fugtig hele tiden og må aldrig tørre ud."
+            },
+            amt_bottom: {
+                group: "3. Vandingsmetode & Mængde",
+                title: "Bundvanding",
+                badge: "📥 Bundvand",
+                desc: "Sættes i en skål/underskål med vand i 15–30 min, så rødderne selv trækker den mængde op, de har brug for."
+            },
+            amt_soak: {
+                group: "3. Vandingsmetode & Mængde",
+                title: "Gennemvanding",
+                badge: "🌊 Gennemvand",
+                desc: "Vandes grundigt oppefra, indtil hele rodklumpen er mættet og overskydende vand løber ud i bunden."
+            },
+            amt_moderate: {
+                group: "3. Vandingsmetode & Mængde",
+                title: "Moderat",
+                badge: "💧 Moderat",
+                desc: "En jævn vanding oppefra, som fugter jorden godt igennem uden at der samler sig stående vand i bunden."
+            },
+            amt_light: {
+                group: "3. Vandingsmetode & Mængde",
+                title: "Sparsom",
+                badge: "🤏 Sparsom",
+                desc: "Kun en lille sjat vand for let at fugte rødderne uden at gennemvæde hele potten."
+            }
+        };
+
+        let categoryDefinitions = JSON.parse(JSON.stringify(DEFAULT_DEFINITIONS));
+        let isEditingDefinitions = false;
+
         let plants = [];
         let plantToDeleteId = null;
         let activeHistoryPlantId = null;
         let activeImageBase64 = "";
+
+        let selectedSunlight = "";
+        let selectedSoilTrigger = "";
+        let selectedWaterAmount = "";
+
         let unsubscribePlants = null;
+        let unsubscribeDefs = null;
         let currentSort = 'days-desc';
 
         const currentMonth = new Date().getMonth();
@@ -331,15 +554,31 @@
                         renderHistoryModalContent(activeHistoryPlantId);
                     }
                 });
+
+                unsubscribeDefs = onSnapshot(doc(db, 'settings', 'definitions'), (docSnap) => {
+                    if (docSnap.exists()) {
+                        const saved = docSnap.data();
+                        categoryDefinitions = JSON.parse(JSON.stringify(DEFAULT_DEFINITIONS));
+                        Object.keys(categoryDefinitions).forEach(key => {
+                            if (saved[key] && saved[key].desc) {
+                                categoryDefinitions[key].desc = saved[key].desc;
+                            }
+                            if (saved[key] && saved[key].title) {
+                                categoryDefinitions[key].title = saved[key].title;
+                            }
+                        });
+                    }
+                    if (!document.getElementById('definitions-modal').classList.contains('hidden')) {
+                        renderDefinitionsModal();
+                    }
+                }, () => {});
             } else {
                 document.getElementById('auth-container').classList.remove('hidden');
                 document.getElementById('app-container').classList.add('hidden');
                 plants = [];
                 renderPlants();
-                if (unsubscribePlants) {
-                    unsubscribePlants();
-                    unsubscribePlants = null;
-                }
+                if (unsubscribePlants) { unsubscribePlants(); unsubscribePlants = null; }
+                if (unsubscribeDefs) { unsubscribeDefs(); unsubscribeDefs = null; }
             }
         });
 
@@ -395,36 +634,270 @@
             }
         }
 
-        // Henter normaliseret og sorteret vandingshistorik (nyeste først)
+        function selectSunlight(type) {
+            selectedSunlight = (selectedSunlight === type) ? "" : type;
+            updateModalSelectorsUI();
+        }
+
+        function selectSoilTrigger(type) {
+            selectedSoilTrigger = (selectedSoilTrigger === type) ? "" : type;
+            updateModalSelectorsUI();
+        }
+
+        function selectWaterAmount(type) {
+            selectedWaterAmount = (selectedWaterAmount === type) ? "" : type;
+            updateModalSelectorsUI();
+        }
+
+        function updateModalSelectorsUI() {
+            const sunDirect = document.getElementById('sun-btn-direct');
+            const sunIndirect = document.getElementById('sun-btn-indirect');
+            if (sunDirect && sunIndirect) {
+                const baseSun = "border py-2.5 px-3 flex items-center justify-center gap-2 text-xs font-mono uppercase transition-colors";
+                sunDirect.className = selectedSunlight === 'direct'
+                    ? `${baseSun} border-amber-500 bg-amber-50 text-amber-950 font-semibold shadow-xs`
+                    : `${baseSun} border-stroke bg-neutral-50/60 text-ink hover:bg-neutral-100`;
+                sunIndirect.className = selectedSunlight === 'indirect'
+                    ? `${baseSun} border-zinc-800 bg-zinc-800 text-white font-semibold shadow-xs`
+                    : `${baseSun} border-stroke bg-neutral-50/60 text-ink hover:bg-neutral-100`;
+            }
+
+            ['bone_dry', 'dry_top', 'slightly_moist', 'moist'].forEach(key => {
+                const el = document.getElementById(`soil-btn-${key}`);
+                if (!el) return;
+                if (selectedSoilTrigger === key) {
+                    el.className = "border-2 border-zinc-800 bg-zinc-900/5 p-2.5 text-left transition-colors shadow-xs";
+                } else {
+                    el.className = "border border-stroke bg-neutral-50/60 hover:bg-neutral-100 p-2.5 text-left transition-colors";
+                }
+            });
+
+            ['bottom', 'soak', 'moderate', 'light'].forEach(key => {
+                const el = document.getElementById(`amt-btn-${key}`);
+                if (!el) return;
+                if (selectedWaterAmount === key) {
+                    el.className = "border-2 border-zinc-800 bg-zinc-900/5 p-2.5 text-left transition-colors shadow-xs";
+                } else {
+                    el.className = "border border-stroke bg-neutral-50/60 hover:bg-neutral-100 p-2.5 text-left transition-colors";
+                }
+            });
+        }
+
+        function renderCareProfileGrid(plant) {
+            let sunVisual = `<span class="text-xs font-mono text-ink-muted">–</span>`;
+            let sunLabel = `Ikke valgt`;
+            if (plant.sunlight === 'direct') {
+                sunLabel = categoryDefinitions.sun_direct?.title || 'Direkte sol';
+                sunVisual = `
+                    <div class="flex items-center gap-1 text-amber-600">
+                        <svg class="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
+                            <circle cx="12" cy="12" r="4"></circle>
+                            <path stroke-linecap="square" d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41m11.32-11.32l1.41-1.41"></path>
+                        </svg>
+                        <span class="text-[10px] font-mono font-bold uppercase text-amber-900">SOL</span>
+                    </div>`;
+            } else if (plant.sunlight === 'indirect') {
+                sunLabel = 'Ej direkte';
+                sunVisual = `
+                    <div class="flex items-center gap-1 text-zinc-600">
+                        <svg class="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="square" d="M3 3l18 18M10.5 6.5A5.5 5.5 0 0117.5 13.5M6.7 6.7a5.5 5.5 0 007.6 7.6M12 2v2m8 8h2M4 12H2m10 8v2"></path>
+                        </svg>
+                        <span class="text-[10px] font-mono font-bold uppercase text-ink">SKYGGE</span>
+                    </div>`;
+            }
+
+            const soilMap = {
+                bone_dry: { label: 'Knastør', level: 1, color: 'bg-amber-600' },
+                dry_top: { label: 'Tør top', level: 2, color: 'bg-emerald-600' },
+                slightly_moist: { label: 'Let fugtig', level: 3, color: 'bg-sky-600' },
+                moist: { label: 'Fugtig', level: 4, color: 'bg-blue-700' }
+            };
+            const soilInfo = soilMap[plant.soilTrigger];
+            let soilVisual = `<span class="text-xs font-mono text-ink-muted">–</span>`;
+            let soilLabel = `Ikke valgt`;
+            if (soilInfo) {
+                soilLabel = soilInfo.label;
+                let bars = '';
+                for (let i = 1; i <= 4; i++) {
+                    bars += `<span class="w-2.5 h-2 ${i <= soilInfo.level ? soilInfo.color : 'bg-zinc-200'}"></span>`;
+                }
+                soilVisual = `<div class="flex items-center gap-0.5 py-1">${bars}</div>`;
+            }
+
+            const amtMap = {
+                bottom: { label: 'Bundvand', icon: '📥', bars: 3, color: 'bg-indigo-600' },
+                soak: { label: 'Gennemvand', icon: '🌊', bars: 4, color: 'bg-blue-600' },
+                moderate: { label: 'Moderat', icon: '💧', bars: 2, color: 'bg-sky-600' },
+                light: { label: 'Sparsom', icon: '🤏', bars: 1, color: 'bg-teal-600' }
+            };
+            const amtInfo = amtMap[plant.waterAmount];
+            let amtVisual = `<span class="text-xs font-mono text-ink-muted">–</span>`;
+            let amtLabel = `Ikke valgt`;
+            if (amtInfo) {
+                amtLabel = amtInfo.label;
+                let bars = '';
+                for (let i = 1; i <= 4; i++) {
+                    bars += `<span class="w-1.5 ${i === 1 ? 'h-1.5' : i === 2 ? 'h-2' : i === 3 ? 'h-2.5' : 'h-3'} ${i <= amtInfo.bars ? amtInfo.color : 'bg-zinc-200'}"></span>`;
+                }
+                amtVisual = `
+                    <div class="flex items-end gap-0.5 h-4">
+                        <span class="text-[11px] leading-none mr-0.5">${amtInfo.icon}</span>
+                        ${bars}
+                    </div>`;
+            }
+
+            return `
+                <div onclick="openDefinitionsModal()" class="cursor-pointer grid grid-cols-3 border border-stroke divide-x divide-stroke mb-3 bg-white hover:bg-neutral-50/80 transition-colors" title="Klik for at se og redigere definitioner">
+                    <div class="p-2 flex flex-col justify-between">
+                        <span class="text-[9px] font-mono uppercase text-ink-muted tracking-wider">Lyskrav</span>
+                        <div class="my-1">${sunVisual}</div>
+                        <span class="text-[11px] font-mono font-medium text-ink truncate">${sunLabel}</span>
+                    </div>
+                    <div class="p-2 flex flex-col justify-between">
+                        <span class="text-[9px] font-mono uppercase text-ink-muted tracking-wider">Vandes ved</span>
+                        <div class="my-1">${soilVisual}</div>
+                        <span class="text-[11px] font-mono font-medium text-ink truncate">${soilLabel}</span>
+                    </div>
+                    <div class="p-2 flex flex-col justify-between">
+                        <span class="text-[9px] font-mono uppercase text-ink-muted tracking-wider">Mængde</span>
+                        <div class="my-1">${amtVisual}</div>
+                        <span class="text-[11px] font-mono font-medium text-ink truncate">${amtLabel}</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        function openDefinitionsModal() {
+            isEditingDefinitions = false;
+            renderDefinitionsModal();
+            document.getElementById('definitions-modal').classList.remove('hidden');
+        }
+
+        function closeDefinitionsModal() {
+            document.getElementById('definitions-modal').classList.add('hidden');
+        }
+
+        function toggleDefinitionsEditMode() {
+            isEditingDefinitions = !isEditingDefinitions;
+            renderDefinitionsModal();
+        }
+
+        function renderDefinitionsModal() {
+            const container = document.getElementById('definitions-content');
+            const editBtn = document.getElementById('toggle-edit-defs-btn');
+            const saveBtn = document.getElementById('save-defs-btn');
+
+            if (isEditingDefinitions) {
+                editBtn.innerText = "Annuller";
+                saveBtn.classList.remove('hidden');
+            } else {
+                editBtn.innerText = "✎ Rediger tekster";
+                saveBtn.classList.add('hidden');
+            }
+
+            const groups = ["1. Sollys", "2. Jord ved vanding", "3. Vandingsmetode & Mængde"];
+            let html = '';
+
+            groups.forEach(groupName => {
+                const entries = Object.entries(categoryDefinitions).filter(([_, val]) => val.group === groupName);
+                html += `
+                    <div>
+                        <h4 class="text-xs font-mono font-bold uppercase tracking-wider text-ink border-b border-stroke pb-1.5 mb-3">${groupName}</h4>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                `;
+
+                entries.forEach(([key, item]) => {
+                    if (isEditingDefinitions) {
+                        html += `
+                            <div class="border border-stroke p-3 bg-neutral-50/70 space-y-2">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-[11px] font-mono font-semibold text-ink">${item.badge}</span>
+                                </div>
+                                <textarea id="def-input-${key}" rows="3" class="w-full border border-stroke bg-white p-2 text-xs font-mono text-ink focus:outline-none focus:border-zinc-700 resize-none">${item.desc}</textarea>
+                            </div>
+                        `;
+                    } else {
+                        html += `
+                            <div class="border border-stroke p-3 bg-white flex flex-col justify-between">
+                                <div class="mb-1.5">
+                                    <span class="inline-block text-[11px] font-mono font-bold uppercase px-1.5 py-0.5 bg-neutral-100 border border-stroke text-ink">${item.badge}</span>
+                                </div>
+                                <p class="text-xs font-mono text-ink-muted leading-relaxed">${item.desc}</p>
+                            </div>
+                        `;
+                    }
+                });
+
+                html += `</div></div>`;
+            });
+
+            container.innerHTML = html;
+        }
+
+        async function saveDefinitions() {
+            if (!auth.currentUser) return showToast("Log ind for at gemme", "error");
+
+            const payload = {};
+            Object.keys(categoryDefinitions).forEach(key => {
+                const input = document.getElementById(`def-input-${key}`);
+                if (input) {
+                    categoryDefinitions[key].desc = input.value.trim();
+                }
+                payload[key] = {
+                    title: categoryDefinitions[key].title,
+                    desc: categoryDefinitions[key].desc
+                };
+            });
+
+            try {
+                await setDoc(doc(db, 'settings', 'definitions'), payload);
+                isEditingDefinitions = false;
+                renderDefinitionsModal();
+                renderPlants();
+                showToast("DEFINITIONER GEMT", "success");
+            } catch (error) {
+                console.error(error);
+                showToast("FEJL VED GEMNING", "error");
+            }
+        }
+
+        function openNoteModal(plantId) {
+            const plant = plants.find(p => p.id === plantId);
+            if (!plant || !plant.notes) return;
+            document.getElementById('note-modal-title').innerText = plant.name;
+            document.getElementById('note-modal-body').innerText = plant.notes;
+            document.getElementById('note-modal').classList.remove('hidden');
+        }
+
+        function closeNoteModal() {
+            document.getElementById('note-modal').classList.add('hidden');
+        }
+
         function getNormalizedHistory(plant) {
             let list = Array.isArray(plant.waterHistory) ? [...plant.waterHistory] : [];
             if (list.length === 0 && plant.lastWatered) {
                 list.push(plant.lastWatered);
             }
-            // Fjern ugyldige tal og sorter faldende (nyeste først)
             return list.filter(ts => typeof ts === 'number' && !isNaN(ts)).sort((a, b) => b - a);
         }
 
-        // Tjekker om et timestamp ligger i sommersæsonen (1. apr - 30. sep)
         function isSummerTimestamp(ts) {
             const m = new Date(ts).getMonth();
             return m >= 3 && m <= 8;
         }
 
-        // Beregner gennemsnitlige dage imellem vandinger opdelt i sommer og vinter
         function calculateSeasonalAverages(plant) {
             const historyDesc = getNormalizedHistory(plant);
-            const asc = [...historyDesc].reverse(); // Ældste først til intervalberegning
+            const asc = [...historyDesc].reverse();
 
             const summerIntervals = [];
             const winterIntervals = [];
 
             for (let i = 1; i < asc.length; i++) {
                 const diffDays = (asc[i] - asc[i - 1]) / 86400000;
-                // Ignorer ekstra klik inden for få timer samme dag (< 0.25 døgn)
                 if (diffDays < 0.25) continue;
 
-                // Sæsonen bestemmes ud fra midtpunktet i intervallet
                 const midTimestamp = (asc[i] + asc[i - 1]) / 2;
                 if (isSummerTimestamp(midTimestamp)) {
                     summerIntervals.push(diffDays);
@@ -470,14 +943,6 @@
             return `${days} dage siden`;
         }
 
-        window.togglePlantNote = function(id, event) {
-            if (event) event.stopPropagation();
-            const notePopup = document.getElementById(`note-popup-${id}`);
-            if (notePopup) {
-                notePopup.classList.toggle('hidden');
-            }
-        };
-
         function renderPlants() {
             const container = document.getElementById('plant-list');
             container.innerHTML = '';
@@ -491,7 +956,6 @@
                 return;
             }
 
-            // Sorter planter
             const sortedPlants = [...plants].sort((a, b) => {
                 const histA = getNormalizedHistory(a);
                 const histB = getNormalizedHistory(b);
@@ -499,9 +963,9 @@
                 const lastB = histB.length > 0 ? histB[0] : (b.lastWatered || 0);
 
                 if (currentSort === 'days-desc') {
-                    return lastA - lastB; // Ældste timestamp (flest dage siden) først
+                    return lastA - lastB;
                 } else if (currentSort === 'days-asc') {
-                    return lastB - lastA; // Nyeste timestamp først
+                    return lastB - lastA;
                 } else {
                     return (a.name || '').localeCompare(b.name || '', 'da');
                 }
@@ -516,11 +980,11 @@
                 const stats = calculateSeasonalAverages(p);
                 const activeAvg = currentSeason === 'summer' ? stats.summerAvg : stats.winterAvg;
 
-                // Visuel indikation hvis man har passeret sit sæsongennemsnit
                 const isAboveAverage = activeAvg !== null && daysSinceWater >= Math.round(parseFloat(activeAvg));
 
                 const needsFert = (currentSeason === 'summer' && p.fertInterval) ? (daysSinceFert >= p.fertInterval) : false;
                 const imgSrc = p.img ? p.img : defaultSVG;
+                const careGridHTML = renderCareProfileGrid(p);
 
                 let daysHeroLabel = `${daysSinceWater}`;
                 let daysHeroSub = daysSinceWater === 1 ? 'DAG SIDEN VANDING' : 'DAGE SIDEN VANDING';
@@ -531,6 +995,12 @@
                     daysHeroLabel = '–';
                     daysHeroSub = 'ALDRIG VANDET';
                 }
+
+                const discreetNoteBtn = p.notes ? `
+                    <button onclick="openNoteModal('${p.id}')" class="border border-stroke p-1.5 text-ink-muted hover:text-ink hover:bg-neutral-100 active:bg-neutral-200 transition-colors" title="Vis pasningsnote">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="square" stroke-linejoin="miter" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                    </button>
+                ` : '';
 
                 const fertStatusRow = (currentSeason === 'summer' && p.fertInterval) ? `
                     <div class="flex items-center justify-between px-2.5 py-1.5 text-xs border border-stroke/80 mb-3 ${needsFert ? 'bg-amber-50/80 text-amber-900 font-semibold border-amber-300' : 'bg-neutral-50/60 text-ink'}">
@@ -550,38 +1020,36 @@
                 container.innerHTML += `
                     <div class="bg-panel border border-stroke p-3.5 sm:p-4 shadow-[2px_2px_0px_0px_rgba(24,24,27,0.04)] flex flex-col justify-between relative hover:border-zinc-400 transition-colors">
                         <div>
-                            <!-- TOP: BILLEDE, NAVN & VÆRKTØJER -->
+                            <!-- TOP: BILLEDE + UFORSTYRRET TITEL OG KOMPAKT VÆRKTØJSLINJE -->
                             <div class="flex items-start gap-3 mb-3">
-                                <div class="w-16 h-16 sm:w-20 sm:h-20 flex-shrink-0 bg-neutral-100 border border-stroke overflow-hidden relative">
+                                <div class="w-20 h-20 flex-shrink-0 bg-neutral-100 border border-stroke overflow-hidden relative">
                                     <img src="${imgSrc}" class="w-full h-full object-cover" alt="${p.name}">
                                 </div>
 
-                                <div class="flex-1 min-w-0">
-                                    <div class="flex items-start justify-between gap-1">
-                                        <h3 class="text-base sm:text-sm font-bold tracking-tight truncate text-ink" title="${p.name}">
+                                <div class="flex-1 min-w-0 flex flex-col justify-between min-h-[5rem]">
+                                    <div>
+                                        <h3 class="text-base font-bold tracking-tight text-ink leading-snug break-words">
                                             ${p.name}
                                         </h3>
-                                        <div class="flex items-center gap-1 flex-shrink-0">
-                                            <button onclick="openHistoryModal('${p.id}')" class="border border-stroke px-2 py-1 text-[10px] font-mono uppercase text-ink hover:bg-neutral-100 active:bg-neutral-200 transition-colors flex items-center gap-1" title="Se vandingshistorik">
-                                                <span>🕒</span>
-                                                <span>${stats.totalLogs}</span>
-                                            </button>
-                                            <button onclick="openPlantModal('${p.id}')" class="border border-stroke p-1.5 text-ink-muted hover:text-ink hover:bg-neutral-100 active:bg-neutral-200 transition-colors" title="Rediger">
-                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
-                                            </button>
-                                            <button onclick="openDeleteModal('${p.id}')" class="border border-stroke p-1.5 text-ink-muted hover:text-red-700 hover:bg-neutral-100 active:bg-neutral-200 transition-colors" title="Slet">
-                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                                            </button>
-                                        </div>
+                                        <p class="text-[11px] font-mono text-ink-muted mt-0.5">
+                                            Sidst vandet: <span class="text-ink font-medium">${formatShortDate(latestWaterTs)}</span>
+                                        </p>
                                     </div>
 
-                                    <p class="text-[11px] font-mono text-ink-muted mt-1">
-                                        Sidst vandet: <span class="text-ink font-medium">${formatShortDate(latestWaterTs)}</span>
-                                    </p>
-                                    
-                                    <button onclick="openHistoryModal('${p.id}')" class="mt-1.5 text-[11px] font-mono uppercase tracking-wider text-ink underline decoration-zinc-400 underline-offset-2 hover:text-zinc-600">
-                                        Se historik (${stats.totalLogs}) →
-                                    </button>
+                                    <!-- ENKEL VÆRKTØJSLINJE (KUN ÉN HISTORIK-KNAP) -->
+                                    <div class="flex items-center gap-1.5 mt-2">
+                                        ${discreetNoteBtn}
+                                        <button onclick="openHistoryModal('${p.id}')" class="border border-stroke px-2 py-1 text-[10px] font-mono uppercase text-ink hover:bg-neutral-100 active:bg-neutral-200 transition-colors flex items-center gap-1" title="Se vandingshistorik">
+                                            <span>🕒</span>
+                                            <span>${stats.totalLogs}</span>
+                                        </button>
+                                        <button onclick="openPlantModal('${p.id}')" class="border border-stroke p-1.5 text-ink-muted hover:text-ink hover:bg-neutral-100 active:bg-neutral-200 transition-colors" title="Rediger">
+                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                                        </button>
+                                        <button onclick="openDeleteModal('${p.id}')" class="border border-stroke p-1.5 text-ink-muted hover:text-red-700 hover:bg-neutral-100 active:bg-neutral-200 transition-colors" title="Slet">
+                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
 
@@ -592,7 +1060,7 @@
                                         💧 ${daysHeroSub}
                                     </span>
                                     <span class="text-[11px] font-mono text-ink-muted">
-                                        ${activeAvg ? `Sæsongns: hver ${activeAvg} dag` : ' Opbygger sæsongennemsnit...'}
+                                        ${activeAvg ? `Sæsongns: hver ${activeAvg} dag` : 'Opbygger sæsongennemsnit...'}
                                     </span>
                                 </div>
                                 <div class="text-right pl-3">
@@ -603,48 +1071,20 @@
                                 </div>
                             </div>
 
+                            <!-- VISUEL PASNINGSPROFIL (LYS / JORD / MÆNGDE) -->
+                            ${careGridHTML}
+
                             <!-- GENNEMSNIT: SOMMER VS. VINTER -->
-                            <div class="grid grid-cols-2 border border-stroke divide-x divide-stroke mb-3 bg-white">
-                                <div class="p-2 ${currentSeason === 'summer' ? 'bg-zinc-900/5' : ''}">
-                                    <div class="flex items-center justify-between">
-                                        <span class="text-[10px] font-mono uppercase text-ink-muted">☀️ Sommer gns.</span>
-                                        ${currentSeason === 'summer' ? '<span class="w-1.5 h-1.5 bg-zinc-800 inline-block" title="Aktiv sæson"></span>' : ''}
-                                    </div>
-                                    <p class="font-mono text-xs font-semibold text-ink mt-0.5">
-                                        ${stats.summerAvg ? `Hver ${stats.summerAvg} d` : '–'}
-                                    </p>
+                            <div class="grid grid-cols-2 border border-stroke divide-x divide-stroke mb-3 bg-neutral-50/40">
+                                <div class="px-2.5 py-1.5 flex items-center justify-between ${currentSeason === 'summer' ? 'bg-zinc-900/5 font-semibold' : ''}">
+                                    <span class="text-[10px] font-mono uppercase text-ink-muted">☀️ Sommer</span>
+                                    <span class="font-mono text-xs text-ink">${stats.summerAvg ? `${stats.summerAvg}d` : '–'}</span>
                                 </div>
-                                <div class="p-2 ${currentSeason === 'winter' ? 'bg-zinc-900/5' : ''}">
-                                    <div class="flex items-center justify-between">
-                                        <span class="text-[10px] font-mono uppercase text-ink-muted">❄️ Vinter gns.</span>
-                                        ${currentSeason === 'winter' ? '<span class="w-1.5 h-1.5 bg-zinc-800 inline-block" title="Aktiv sæson"></span>' : ''}
-                                    </div>
-                                    <p class="font-mono text-xs font-semibold text-ink mt-0.5">
-                                        ${stats.winterAvg ? `Hver ${stats.winterAvg} d` : '–'}
-                                    </p>
+                                <div class="px-2.5 py-1.5 flex items-center justify-between ${currentSeason === 'winter' ? 'bg-zinc-900/5 font-semibold' : ''}">
+                                    <span class="text-[10px] font-mono uppercase text-ink-muted">❄️ Vinter</span>
+                                    <span class="font-mono text-xs text-ink">${stats.winterAvg ? `${stats.winterAvg}d` : '–'}</span>
                                 </div>
                             </div>
-
-                            <!-- NOTE SEKTION (MOBIL- OG DESKTOPVENLIG) -->
-                            ${p.notes ? `
-                            <div class="relative mb-3">
-                                <div onclick="togglePlantNote('${p.id}', event)" class="cursor-pointer border border-stroke bg-neutral-50/70 hover:bg-neutral-100 active:bg-neutral-200 px-2.5 py-2 flex items-center justify-between text-xs transition-colors select-none">
-                                    <div class="flex items-center gap-1.5 min-w-0 pr-1">
-                                        <span class="inline-flex items-center justify-center w-4 h-4 bg-zinc-700 text-white font-mono text-[10px] font-medium flex-shrink-0">i</span>
-                                        <span class="truncate font-mono text-[11px] text-ink-muted">${p.notes}</span>
-                                    </div>
-                                    <span class="text-[10px] font-mono uppercase text-ink-muted underline flex-shrink-0">Note</span>
-                                </div>
-
-                                <div id="note-popup-${p.id}" class="hidden mt-1.5 bg-panel border border-stroke p-2.5 text-xs font-mono shadow-[2px_2px_0px_0px_rgba(24,24,27,0.04)]">
-                                    <div class="flex items-center justify-between border-b border-stroke pb-1 mb-1.5">
-                                        <span class="font-semibold uppercase text-[10px] text-ink">Pasningsnote</span>
-                                        <button onclick="togglePlantNote('${p.id}', event)" class="text-[10px] text-ink-muted hover:text-ink uppercase underline">Luk [X]</button>
-                                    </div>
-                                    <p class="text-ink leading-relaxed whitespace-pre-wrap">${p.notes}</p>
-                                </div>
-                            </div>
-                            ` : ''}
 
                             ${fertStatusRow}
                         </div>
@@ -687,7 +1127,6 @@
             }
         }
 
-        // HISTORIK MODAL FUNKTIONER
         function openHistoryModal(id) {
             activeHistoryPlantId = id;
             const todayStr = new Date().toISOString().split('T')[0];
@@ -722,7 +1161,7 @@
 
             listEl.innerHTML = '';
             historyDesc.forEach((ts, idx) => {
-                const prevTs = historyDesc[idx + 1]; // Den forrige vanding kronologisk
+                const prevTs = historyDesc[idx + 1];
                 let intervalBadge = '<span class="text-[10px] font-mono text-ink-muted">Første log</span>';
 
                 if (prevTs) {
@@ -769,7 +1208,6 @@
             const plant = plants.find(p => p.id === activeHistoryPlantId);
             if (!plant) return;
 
-            // Sæt tidspunkt til kl. 12:00 på den valgte dato
             const selectedTs = new Date(`${dateVal}T12:00:00`).getTime();
             if (isNaN(selectedTs)) return showToast("Ugyldig dato", "error");
 
@@ -795,7 +1233,6 @@
 
             try {
                 const currentHistory = getNormalizedHistory(plant);
-                // Fjern kun ét match af timestampet
                 const index = currentHistory.indexOf(timestampToRemove);
                 if (index > -1) {
                     currentHistory.splice(index, 1);
@@ -836,6 +1273,9 @@
             document.getElementById('p-image').value = '';
             document.getElementById('image-preview').classList.add('hidden');
             activeImageBase64 = "";
+            selectedSunlight = "";
+            selectedSoilTrigger = "";
+            selectedWaterAmount = "";
 
             if (id) {
                 const plant = plants.find(p => p.id === id);
@@ -845,6 +1285,9 @@
                     document.getElementById('p-name').value = plant.name;
                     document.getElementById('p-fert').value = plant.fertInterval || '';
                     document.getElementById('p-notes').value = plant.notes || '';
+                    selectedSunlight = plant.sunlight || '';
+                    selectedSoilTrigger = plant.soilTrigger || '';
+                    selectedWaterAmount = plant.waterAmount || '';
                     if (plant.img) {
                         activeImageBase64 = plant.img;
                         const preview = document.getElementById('image-preview');
@@ -855,6 +1298,7 @@
             } else {
                 document.getElementById('modal-title').innerText = "Tilføj ny plante";
             }
+            updateModalSelectorsUI();
             document.getElementById('plant-modal').classList.remove('hidden');
         }
 
@@ -920,6 +1364,9 @@
                     const plantRef = doc(db, 'plants', id);
                     const updatePayload = {
                         name: name,
+                        sunlight: selectedSunlight,
+                        soilTrigger: selectedSoilTrigger,
+                        waterAmount: selectedWaterAmount,
                         fertInterval: fert,
                         notes: notes
                     };
@@ -932,6 +1379,9 @@
                     const now = Date.now();
                     await addDoc(collection(db, 'plants'), {
                         name: name,
+                        sunlight: selectedSunlight,
+                        soilTrigger: selectedSoilTrigger,
+                        waterAmount: selectedWaterAmount,
                         fertInterval: fert,
                         notes: notes,
                         lastWatered: now,
@@ -970,7 +1420,6 @@
             }
         }
 
-        // FUNKTION TIL IMPORT AF DATA
         window.importData = function(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -1000,6 +1449,15 @@
         window.handleLogout = handleLogout;
         window.setSeason = setSeason;
         window.changeSort = changeSort;
+        window.selectSunlight = selectSunlight;
+        window.selectSoilTrigger = selectSoilTrigger;
+        window.selectWaterAmount = selectWaterAmount;
+        window.openDefinitionsModal = openDefinitionsModal;
+        window.closeDefinitionsModal = closeDefinitionsModal;
+        window.toggleDefinitionsEditMode = toggleDefinitionsEditMode;
+        window.saveDefinitions = saveDefinitions;
+        window.openNoteModal = openNoteModal;
+        window.closeNoteModal = closeNoteModal;
         window.openPlantModal = openPlantModal;
         window.closePlantModal = closePlantModal;
         window.openHistoryModal = openHistoryModal;
