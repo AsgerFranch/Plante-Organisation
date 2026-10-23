@@ -267,6 +267,34 @@
                                 <span class="block text-[10px] font-mono text-ink-muted">Lille sjat / let fugt</span>
                             </button>
                         </div>
+
+                        <!-- VALGFRI GENNEMVANDING VED BUNDVANDING -->
+                        <div id="bottom-flush-config" class="hidden mt-2.5 border border-stroke bg-neutral-50/80 p-3 space-y-3">
+                            <label class="flex items-center justify-between cursor-pointer select-none">
+                                <div>
+                                    <span class="block text-xs font-mono font-semibold uppercase text-ink">🌊 Periodisk gennemvanding</span>
+                                    <span class="block text-[10px] font-mono text-ink-muted">Skyl salte ud ved at gennemvande oppefra med fast interval</span>
+                                </div>
+                                <input type="checkbox" id="p-flush-enabled" onchange="toggleFlushConfigUI()" class="w-4 h-4 accent-zinc-800 cursor-pointer flex-shrink-0 ml-2">
+                            </label>
+
+                            <div id="bottom-flush-inputs" class="hidden pt-2 border-t border-stroke/80 space-y-2.5">
+                                <div class="flex items-center justify-between gap-3">
+                                    <label for="p-flush-interval" class="text-[11px] font-mono uppercase text-ink-muted">Gennemvand hver:</label>
+                                    <div class="flex items-center gap-1.5">
+                                        <input type="number" id="p-flush-interval" min="2" max="50" value="5" oninput="updateFlushHelperText()" class="w-16 border border-stroke px-2 py-1 text-xs font-mono text-ink bg-white focus:outline-none focus:border-zinc-600 text-center">
+                                        <span class="text-xs font-mono text-ink-muted">. gang</span>
+                                    </div>
+                                </div>
+                                <p id="flush-helper-text" class="text-[10px] font-mono text-ink-muted bg-white border border-stroke/70 px-2.5 py-1.5">
+                                    Efter 4 bundvandinger vil der stå, at næste vanding (nr. 5) skal være en gennemvanding.
+                                </p>
+                                <div class="flex items-center justify-between gap-3 pt-1">
+                                    <label for="p-flush-count" class="text-[10px] font-mono uppercase text-ink-muted">Bundvandinger siden sidste gennemvanding:</label>
+                                    <input type="number" id="p-flush-count" min="0" max="49" value="0" class="w-14 border border-stroke px-2 py-1 text-xs font-mono text-ink bg-white focus:outline-none focus:border-zinc-600 text-center">
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     
                     <div>
@@ -649,6 +677,29 @@
             updateModalSelectorsUI();
         }
 
+        function toggleFlushConfigUI() {
+            const enabled = document.getElementById('p-flush-enabled').checked;
+            const inputsContainer = document.getElementById('bottom-flush-inputs');
+            if (enabled) {
+                inputsContainer.classList.remove('hidden');
+                updateFlushHelperText();
+            } else {
+                inputsContainer.classList.add('hidden');
+            }
+        }
+
+        function updateFlushHelperText() {
+            const intervalVal = parseInt(document.getElementById('p-flush-interval').value) || 5;
+            const helperEl = document.getElementById('flush-helper-text');
+            if (!helperEl) return;
+            if (intervalVal >= 2) {
+                const beforeFlush = intervalVal - 1;
+                helperEl.innerText = `Efter ${beforeFlush} ${beforeFlush === 1 ? 'bundvanding' : 'bundvandinger'} vil der stå, at næste vanding (nr. ${intervalVal}) skal være en gennemvanding.`;
+            } else {
+                helperEl.innerText = `Indstil et tal på mindst 2 (f.eks. 5).`;
+            }
+        }
+
         function updateModalSelectorsUI() {
             const sunDirect = document.getElementById('sun-btn-direct');
             const sunIndirect = document.getElementById('sun-btn-indirect');
@@ -681,6 +732,16 @@
                     el.className = "border border-stroke bg-neutral-50/60 hover:bg-neutral-100 p-2.5 text-left transition-colors";
                 }
             });
+
+            const flushConfigBox = document.getElementById('bottom-flush-config');
+            if (flushConfigBox) {
+                if (selectedWaterAmount === 'bottom') {
+                    flushConfigBox.classList.remove('hidden');
+                    toggleFlushConfigUI();
+                } else {
+                    flushConfigBox.classList.add('hidden');
+                }
+            }
         }
 
         function renderCareProfileGrid(plant) {
@@ -986,6 +1047,34 @@
                 const imgSrc = p.img ? p.img : defaultSVG;
                 const careGridHTML = renderCareProfileGrid(p);
 
+                // Gennemvandings-logik for bundvandede planter
+                const hasFlushFeature = (p.waterAmount === 'bottom' && p.flushEnabled && p.flushInterval && p.flushInterval >= 2);
+                const currentFlushCount = p.flushCount || 0;
+                const requiredBottomWaterings = hasFlushFeature ? (p.flushInterval - 1) : 0;
+                const isNextFlush = hasFlushFeature && (currentFlushCount >= requiredBottomWaterings);
+
+                let flushStatusRow = '';
+                if (hasFlushFeature) {
+                    if (isNextFlush) {
+                        flushStatusRow = `
+                            <div class="flex items-center justify-between px-2.5 py-2 text-xs border border-blue-400 bg-blue-50/90 text-blue-950 font-semibold mb-3">
+                                <span class="font-mono uppercase text-[11px] flex items-center gap-1.5">
+                                    <span>🌊</span>
+                                    <span>Næste vanding: Gennemvanding!</span>
+                                </span>
+                                <span class="font-mono text-[10px] px-1.5 py-0.5 bg-blue-900 text-white uppercase">${currentFlushCount}/${requiredBottomWaterings} bund</span>
+                            </div>
+                        `;
+                    } else {
+                        flushStatusRow = `
+                            <div class="flex items-center justify-between px-2.5 py-1.5 text-xs border border-stroke/80 bg-neutral-50/60 text-ink mb-3">
+                                <span class="font-mono uppercase text-[10px] text-ink-muted">🌊 Gennemvanding (hver ${p.flushInterval}.):</span>
+                                <span class="font-mono text-[11px] font-medium">${currentFlushCount} / ${requiredBottomWaterings} bundvandinger</span>
+                            </div>
+                        `;
+                    }
+                }
+
                 let daysHeroLabel = `${daysSinceWater}`;
                 let daysHeroSub = daysSinceWater === 1 ? 'DAG SIDEN VANDING' : 'DAGE SIDEN VANDING';
                 if (daysSinceWater === 0) {
@@ -1016,6 +1105,10 @@
                 ` : '';
 
                 const buttonsGridClass = (currentSeason === 'summer' && p.fertInterval) ? 'grid-cols-2' : 'grid-cols-1';
+                const waterBtnLabel = isNextFlush ? '🌊 Gennemvand nu' : '💧 Vand nu';
+                const waterBtnClass = isNextFlush
+                    ? 'bg-blue-800 hover:bg-blue-700 active:bg-blue-900 text-white border border-blue-800'
+                    : 'bg-zinc-800 hover:bg-zinc-700 active:bg-zinc-900 text-white border border-zinc-800';
 
                 container.innerHTML += `
                     <div class="bg-panel border border-stroke p-3.5 sm:p-4 shadow-[2px_2px_0px_0px_rgba(24,24,27,0.04)] flex flex-col justify-between relative hover:border-zinc-400 transition-colors">
@@ -1074,6 +1167,9 @@
                             <!-- VISUEL PASNINGSPROFIL (LYS / JORD / MÆNGDE) -->
                             ${careGridHTML}
 
+                            <!-- GENNEMVANDINGS-STATUS (KUN HVIS SLÅET TIL VED BUNDVANDING) -->
+                            ${flushStatusRow}
+
                             <!-- GENNEMSNIT: SOMMER VS. VINTER -->
                             <div class="grid grid-cols-2 border border-stroke divide-x divide-stroke mb-3 bg-neutral-50/40">
                                 <div class="px-2.5 py-1.5 flex items-center justify-between ${currentSeason === 'summer' ? 'bg-zinc-900/5 font-semibold' : ''}">
@@ -1091,8 +1187,8 @@
 
                         <!-- BUND: VANDINGSKNAP -->
                         <div class="grid ${buttonsGridClass} gap-1.5 pt-1">
-                            <button onclick="waterPlant('${p.id}', false)" class="bg-zinc-800 hover:bg-zinc-700 active:bg-zinc-900 text-white border border-zinc-800 font-medium py-2.5 sm:py-2 px-3 text-xs uppercase tracking-wider transition-colors shadow-xs flex items-center justify-center gap-1.5">
-                                <span>💧 Vand nu</span>
+                            <button onclick="waterPlant('${p.id}', false)" class="${waterBtnClass} font-medium py-2.5 sm:py-2 px-3 text-xs uppercase tracking-wider transition-colors shadow-xs flex items-center justify-center gap-1.5">
+                                <span>${waterBtnLabel}</span>
                             </button>
                             ${fertButton}
                         </div>
@@ -1118,9 +1214,25 @@
                 if (withFertilizer && plant.fertInterval && currentSeason === 'summer') {
                     updates.lastFert = now;
                 }
+
+                let wasFlush = false;
+                if (plant.waterAmount === 'bottom' && plant.flushEnabled && plant.flushInterval && plant.flushInterval >= 2) {
+                    const currentCount = plant.flushCount || 0;
+                    const requiredBottom = plant.flushInterval - 1;
+                    if (currentCount >= requiredBottom) {
+                        updates.flushCount = 0;
+                        wasFlush = true;
+                    } else {
+                        updates.flushCount = currentCount + 1;
+                    }
+                }
                 
                 await updateDoc(plantRef, updates);
-                showToast(`${plant.name} vandet!`, "success");
+                if (wasFlush) {
+                    showToast(`${plant.name} gennemvandet! Tæller nulstillet`, "success");
+                } else {
+                    showToast(`${plant.name} vandet!`, "success");
+                }
             } catch (error) {
                 console.error(error);
                 showToast("Fejl ved opdatering", "error");
@@ -1272,6 +1384,10 @@
             document.getElementById('p-notes').value = '';
             document.getElementById('p-image').value = '';
             document.getElementById('image-preview').classList.add('hidden');
+            document.getElementById('p-flush-enabled').checked = false;
+            document.getElementById('p-flush-interval').value = 5;
+            document.getElementById('p-flush-count').value = 0;
+
             activeImageBase64 = "";
             selectedSunlight = "";
             selectedSoilTrigger = "";
@@ -1288,6 +1404,9 @@
                     selectedSunlight = plant.sunlight || '';
                     selectedSoilTrigger = plant.soilTrigger || '';
                     selectedWaterAmount = plant.waterAmount || '';
+                    document.getElementById('p-flush-enabled').checked = Boolean(plant.flushEnabled);
+                    document.getElementById('p-flush-interval').value = plant.flushInterval || 5;
+                    document.getElementById('p-flush-count').value = plant.flushCount || 0;
                     if (plant.img) {
                         activeImageBase64 = plant.img;
                         const preview = document.getElementById('image-preview');
@@ -1354,6 +1473,10 @@
             const fert = document.getElementById('p-fert').value ? parseInt(document.getElementById('p-fert').value) : null;
             const notes = document.getElementById('p-notes').value.trim();
 
+            const flushEnabled = (selectedWaterAmount === 'bottom') && document.getElementById('p-flush-enabled').checked;
+            const flushInterval = flushEnabled ? Math.max(2, parseInt(document.getElementById('p-flush-interval').value) || 5) : null;
+            const flushCount = flushEnabled ? Math.max(0, parseInt(document.getElementById('p-flush-count').value) || 0) : 0;
+
             if (!name) {
                 showToast("UDFYLD PLANTENS NAVN", "error");
                 return;
@@ -1367,6 +1490,9 @@
                         sunlight: selectedSunlight,
                         soilTrigger: selectedSoilTrigger,
                         waterAmount: selectedWaterAmount,
+                        flushEnabled: flushEnabled,
+                        flushInterval: flushInterval,
+                        flushCount: flushCount,
                         fertInterval: fert,
                         notes: notes
                     };
@@ -1382,6 +1508,9 @@
                         sunlight: selectedSunlight,
                         soilTrigger: selectedSoilTrigger,
                         waterAmount: selectedWaterAmount,
+                        flushEnabled: flushEnabled,
+                        flushInterval: flushInterval,
+                        flushCount: flushCount,
                         fertInterval: fert,
                         notes: notes,
                         lastWatered: now,
@@ -1452,6 +1581,8 @@
         window.selectSunlight = selectSunlight;
         window.selectSoilTrigger = selectSoilTrigger;
         window.selectWaterAmount = selectWaterAmount;
+        window.toggleFlushConfigUI = toggleFlushConfigUI;
+        window.updateFlushHelperText = updateFlushHelperText;
         window.openDefinitionsModal = openDefinitionsModal;
         window.closeDefinitionsModal = closeDefinitionsModal;
         window.toggleDefinitionsEditMode = toggleDefinitionsEditMode;
